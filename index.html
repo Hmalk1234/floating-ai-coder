@@ -41,33 +41,63 @@
             </div>
         </header>
 
-        <!-- Simulated code lines for background coding ambiance -->
-        <main class="mock-editor">
-            <div class="line-numbers">
-                <span>1</span><span>2</span><span>3</span><span>4</span><span>5</span><span>6</span><span>7</span><span>8</span><span>9</span><span>10</span><span>11</span><span>12</span><span>13</span><span>14</span><span>15</span><span>16</span><span>17</span><span>18</span><span>19</span><span>20</span>
-            </div>
-            <pre class="code-area"><code class="language-lua"><span class="token comment">-- Roblox Game Script Example: Pet System controller</span>
-local Players = game:GetService("Players")
-local DataStoreService = game:GetService("DataStoreService")
-local PetDataStore = DataStoreService:GetDataStore("PetSaveSystem")
+        <!-- Interactive Multi-file Workspace -->
+        <main class="workspace-container">
+            <!-- Sidebar Explorer -->
+            <aside class="workspace-sidebar">
+                <div class="sidebar-header">
+                    <h4>📁 EXPLORER</h4>
+                </div>
+                <ul class="file-list" id="workspace-files">
+                    <li class="file-item active" data-file="index.html">
+                        <span class="file-icon">🌐</span> index.html
+                    </li>
+                    <li class="file-item" data-file="style.css">
+                        <span class="file-icon">🎨</span> style.css
+                    </li>
+                    <li class="file-item" data-file="main.py">
+                        <span class="file-icon">🐍</span> main.py
+                    </li>
+                    <li class="file-item" data-file="Index.java">
+                        <span class="file-icon">☕</span> Index.java
+                    </li>
+                </ul>
+            </aside>
 
-local function onPlayerAdded(player)
-    local leaderstats = Instance.new("Folder")
-    leaderstats.Name = "leaderstats"
-    leaderstats.Parent = player
+            <!-- Interactive Code Editor -->
+            <section class="workspace-editor-panel">
+                <div class="editor-header">
+                    <span class="active-filename-title" id="active-filename">index.html</span>
+                    <div class="editor-actions">
+                        <button id="btn-run-preview" class="btn-workspace-action" title="Jalankan visual preview kode">⚡ Run Preview</button>
+                        <button id="btn-gen-flowchart" class="btn-workspace-action" title="Buat flowchart logika kode">📊 Flowchart</button>
+                    </div>
+                </div>
+                <div class="editor-body">
+                    <div class="line-numbers-container" id="editor-line-numbers">
+                        <span>1</span>
+                    </div>
+                    <div class="editor-textarea-wrapper">
+                        <textarea id="workspace-editor-input" spellcheck="false"></textarea>
+                        <pre class="editor-highlight-pre"><code id="workspace-editor-highlight" class="language-html"></code></pre>
+                    </div>
+                </div>
+            </section>
 
-    local coins = Instance.new("IntValue")
-    coins.Name = "Coins"
-    coins.Value = 100
-    coins.Parent = leaderstats
-
-    local equippedPet = Instance.new("StringValue")
-    equippedPet.Name = "EquippedPet"
-    equippedPet.Value = "None"
-    equippedPet.Parent = player
-end
-
-Players.PlayerAdded:Connect(onPlayerAdded)</code></pre>
+            <!-- Visual Preview & Flowchart Panel -->
+            <section class="workspace-preview-panel">
+                <div class="preview-header">
+                    <h4>👁️ LIVE VISUAL PREVIEW & FLOWCHART</h4>
+                </div>
+                <div class="preview-body" id="workspace-preview-body">
+                    <iframe id="live-preview-iframe" class="preview-frame" sandbox="allow-scripts"></iframe>
+                    <div id="live-preview-console" class="preview-console hidden">
+                        <div class="console-header">Console Output</div>
+                        <pre class="console-log" id="console-log-output"></pre>
+                    </div>
+                    <div id="live-preview-flowchart" class="preview-flowchart hidden"></div>
+                </div>
+            </section>
         </main>
     </div>
 
@@ -120,6 +150,9 @@ Players.PlayerAdded:Connect(onPlayerAdded)</code></pre>
             </button>
             <button class="tab-btn" data-category="tanya">
                 <span class="tab-icon">❓</span> Tanya AI
+            </button>
+            <button class="tab-btn" data-category="bughunter">
+                <span class="tab-icon">🪲</span> Bug Hunter
             </button>
             <button class="tab-btn creator-tab hidden" data-category="creator">
                 <span class="tab-icon">🎨</span> Creator
@@ -265,12 +298,62 @@ Players.PlayerAdded:Connect(onPlayerAdded)</code></pre>
                 </div>
             </div>
 
+            <!-- E. BUG HUNTER VIEW (HIDDEN BY DEFAULT, ACCESSED VIA BUG HUNTER TAB) -->
+            <div id="bughunter-content-view" class="tab-view hidden">
+                <div class="bughunter-box">
+                    <h3 class="view-title">🪲 Bug Hunter & Kamus Error</h3>
+                    <p class="view-subtitle">Masukkan log error dari terminal Anda. AI akan menganalisis penyebab dan memberikan perbaikan instan.</p>
+                    
+                    <div class="terminal-paste-area">
+                        <div class="terminal-header">
+                            <span class="term-dot red"></span>
+                            <span class="term-dot yellow"></span>
+                            <span class="term-dot green"></span>
+                            <span class="term-title">Console Error Input</span>
+                        </div>
+                        <textarea id="terminal-error-input" placeholder="Contoh: NameError: name 'x' is not defined atau java.lang.NullPointerException..."></textarea>
+                    </div>
+                    
+                    <button id="btn-hunt-bugs" class="btn-hunt-submit">🔍 Menganalisis Error & Cari Solusi</button>
+                    
+                    <div id="bug-analysis-result" class="analysis-result-box hidden">
+                        <div class="error-dictionary-card">
+                            <h4>Kamus Error: <span id="error-detected-type">NullPointerException</span></h4>
+                            <p id="error-detected-desc">Terjadi ketika program mencoba menggunakan referensi objek yang bernilai null.</p>
+                        </div>
+                        <div class="error-solution-card">
+                            <h4>Solusi Perbaikan:</h4>
+                            <p id="error-detected-sol">Inisialisasi objek sebelum digunakan atau tambahkan pengecekan null.</p>
+                            <div class="diff-view-container">
+                                <div class="diff-pane diff-before">
+                                    <h5>Sebelum (Error):</h5>
+                                    <pre><code id="diff-code-before"></code></pre>
+                                </div>
+                                <div class="diff-pane diff-after">
+                                    <h5>Sesudah (Diperbaiki):</h5>
+                                    <pre><code id="diff-code-after"></code></pre>
+                                </div>
+                            </div>
+                            <button id="btn-apply-bugfix" class="btn-apply-fix">🔧 Terapkan Perbaikan ke File Aktif</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
         </div>
 
         <!-- Panel Footer (Only visible once logged in & chat content is selected) -->
         <footer class="panel-footer" id="panel-footer-bar">
             <form id="chat-form" class="chat-input-area">
-                <input type="text" id="chat-input" placeholder="Tulis instruksi coding di sini..." autocomplete="off" required>
+                <button type="button" id="btn-voice-input" class="btn-voice-mic" title="Voice Coding (Bicara)">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"></path>
+                        <path d="M19 10v2a7 7 0 0 1-14 0v-2"></path>
+                        <line x1="12" y1="19" x2="12" y2="23"></line>
+                        <line x1="8" y1="23" x2="16" y2="23"></line>
+                    </svg>
+                </button>
+                <input type="text" id="chat-input" placeholder="Bicara / Tulis instruksi coding..." autocomplete="off" required>
                 <button type="submit" class="btn-send" title="Kirim Pesan">
                     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
                         <line x1="22" y1="2" x2="11" y2="13"></line>
@@ -280,6 +363,16 @@ Players.PlayerAdded:Connect(onPlayerAdded)</code></pre>
             </form>
             <div class="panel-meta-actions">
                 <span class="active-mode-label">Mode: <strong id="current-mode-text">Roblox Expert</strong></span>
+                <div class="chat-context-select-wrapper">
+                    <span>Context:</span>
+                    <select id="chat-file-context">
+                        <option value="none">Tanpa File</option>
+                        <option value="index.html">index.html</option>
+                        <option value="style.css">style.css</option>
+                        <option value="main.py">main.py</option>
+                        <option value="Index.java">Index.java</option>
+                    </select>
+                </div>
                 <button id="btn-clear-chat" class="meta-btn" title="Bersihkan Chat">
                     <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
                     <span>Clear</span>

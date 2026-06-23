@@ -33,7 +33,38 @@ document.addEventListener("DOMContentLoaded", () => {
     const chatInputView = document.getElementById("chat-content-view");
     const creatorView = document.getElementById("creator-content-view");
     const adminView = document.getElementById("admin-content-view");
+    const bughunterView = document.getElementById("bughunter-content-view");
     const panelFooter = document.getElementById("panel-footer-bar");
+    
+    // Workspace Explorer Selectors
+    const workspaceFiles = document.getElementById("workspace-files");
+    const activeFilename = document.getElementById("active-filename");
+    const editorLineNumbers = document.getElementById("editor-line-numbers");
+    const editorInput = document.getElementById("workspace-editor-input");
+    const editorHighlight = document.getElementById("workspace-editor-highlight");
+    const btnRunPreview = document.getElementById("btn-run-preview");
+    const btnGenFlowchart = document.getElementById("btn-gen-flowchart");
+    
+    // Live Preview Selectors
+    const previewIframe = document.getElementById("live-preview-iframe");
+    const previewConsole = document.getElementById("live-preview-console");
+    const consoleLogOutput = document.getElementById("console-log-output");
+    const previewFlowchart = document.getElementById("live-preview-flowchart");
+    
+    // Voice Coding & Context Selectors
+    const btnVoiceInput = document.getElementById("btn-voice-input");
+    const chatFileContext = document.getElementById("chat-file-context");
+    
+    // Bug Hunter Selectors
+    const terminalErrorInput = document.getElementById("terminal-error-input");
+    const btnHuntBugs = document.getElementById("btn-hunt-bugs");
+    const bugAnalysisResult = document.getElementById("bug-analysis-result");
+    const errorDetectedType = document.getElementById("error-detected-type");
+    const errorDetectedDesc = document.getElementById("error-detected-desc");
+    const errorDetectedSol = document.getElementById("error-detected-sol");
+    const diffCodeBefore = document.getElementById("diff-code-before");
+    const diffCodeAfter = document.getElementById("diff-code-after");
+    const btnApplyBugfix = document.getElementById("btn-apply-bugfix");
     
     const chatMessages = chatBody.querySelector(".chat-messages");
     const suggestionsBox = document.getElementById("suggestions-box");
@@ -526,6 +557,7 @@ app.listen(3000, () => console.log('Server running!'));`
         chatInputView.classList.add("hidden");
         creatorView.classList.add("hidden");
         adminView.classList.add("hidden");
+        bughunterView.classList.add("hidden");
         panelFooter.classList.add("hidden");
 
         if (cat === "creator") {
@@ -538,7 +570,12 @@ app.listen(3000, () => console.log('Server running!'));`
             adminView.classList.remove("hidden");
             currentModeText.textContent = "Admin Control";
             renderAdminUsersTable();
-            showToast("🛠️ Membuka Panel Admin", "mode");
+            showToast("🛠️ Panel Admin", "mode");
+        } else if (cat === "bughunter") {
+            // Show Bug Hunter View
+            bughunterView.classList.remove("hidden");
+            currentModeText.textContent = "Bug Hunter & Kamus Error";
+            showToast("🪲 Membuka Bug Hunter", "mode");
         } else {
             // Show standard Chat log
             chatInputView.classList.remove("hidden");
@@ -994,8 +1031,108 @@ app.listen(3000, () => console.log('Server running!'));`
 
     function processQuery(query) {
         const lower = query.toLowerCase();
-        let matchedResponse = null;
+        const contextFile = chatFileContext.value;
 
+        // Custom Context-based response handler
+        if (contextFile !== "none" && (lower.includes("optimalkan") || lower.includes("optimasi") || lower.includes("cepat") || lower.includes("jelaskan") || lower.includes("cara kerja") || lower.includes("maksud"))) {
+            let contextContent = filesData[contextFile].content;
+            let responseText = "";
+            let responseTitle = `Optimasi File ${contextFile}`;
+            let codeOutput = "";
+            let lang = filesData[contextFile].lang;
+            
+            if (lower.includes("optimalkan") || lower.includes("optimasi") || lower.includes("cepat")) {
+                if (contextFile === "main.py") {
+                    responseText = "Optimasi dilakukan dengan mengimplementasikan Caching (Memoization) untuk pemanggilan user_id berulang agar menghemat eksekusi database.";
+                    codeOutput = `# main.py (Dioptimalkan)
+import json
+import time
+
+cache = {}
+
+def process_data(user_id):
+    if user_id in cache:
+        return cache[user_id]
+        
+    print(f"Mengambil data untuk user: {user_id}")
+    time.sleep(0.01) # database lookup optimized
+    
+    result = {
+        "status": "success",
+        "timestamp": int(time.time()),
+        "data": {
+            "coins": 2500,
+            "level": 4
+        }
+    }
+    cache[user_id] = json.dumps(result)
+    return cache[user_id]
+
+print(process_data("user_101"))`;
+                } else if (contextFile === "index.html") {
+                    responseText = "Optimasi performa rendering halaman dengan menambahkan dynamic viewport sizing dan fallback font stack.";
+                    codeOutput = `<!DOCTYPE html>
+<html>
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        body { background: #090d16; font-family: system-ui, sans-serif; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Render Optimized</h1>
+    </div>
+</body>
+</html>`;
+                } else if (contextFile === "style.css") {
+                    responseText = "Optimasi CSS dengan merapikan custom properties, menyingkirkan transisi redundant, dan menambahkan hardware acceleration.";
+                    codeOutput = `/* style.css (Dioptimalkan) */
+.container {
+    background: rgba(139, 92, 246, 0.15);
+    border: 1px solid var(--theme-primary);
+    box-shadow: 0 0 25px var(--theme-glow);
+    transform: translateZ(0); /* Hardware acceleration */
+}`;
+                } else if (contextFile === "Index.java") {
+                    responseText = "Optimasi dilakukan dengan menghindari Exception crash null dan menambahkan validation logic.";
+                    codeOutput = `// Index.java (Dioptimalkan)
+public class UserController {
+    private String username;
+    private String role;
+
+    public UserController(String username, String role) {
+        this.username = username != null ? username : "Guest";
+        this.role = role != null ? role : "Biasa";
+    }
+
+    public void displayUserInfo() {
+        System.out.println("User: " + this.username + " (" + this.role + ")");
+    }
+}`;
+                } else {
+                    responseText = `File ${contextFile} dioptimalkan dengan memperpendek memory flow.`;
+                    codeOutput = contextContent;
+                }
+                appendAIResponse(responseTitle, responseText, codeOutput, lang);
+                return;
+            } else if (lower.includes("jelaskan") || lower.includes("cara kerja") || lower.includes("maksud")) {
+                let expl = "";
+                if (contextFile === "Index.java") {
+                    expl = "File `Index.java` mendefinisikan class `UserController` untuk otentikasi user. Jika parameter username instansiasi bernilai null, memicu Java NullPointerException runtime crash.";
+                } else if (contextFile === "main.py") {
+                    expl = "File `main.py` adalah penanganan database simulation di Python. Terdapat method `process_data` dengan penundaan pemrosesan 1 detik menggunakan `time.sleep(1)`.";
+                } else if (contextFile === "index.html") {
+                    expl = "File `index.html` menyusun struktur UI visual preview utama dengan class `.container` bergaya glassmorphism.";
+                } else {
+                    expl = `File \`${contextFile}\` menyimpan konfigurasi workspace active.`;
+                }
+                appendAIResponse(`Penjelasan File ${contextFile}`, expl, null, null);
+                return;
+            }
+        }
+
+        let matchedResponse = null;
         const keys = Object.keys(codingPresets[currentCategory].responses);
         for (let key of keys) {
             const shortName = key.split("_")[1] || "";
@@ -1393,7 +1530,636 @@ initializeSystem();`;
         }, 3000);
     }
 
+    /* ==========================================
+       WORKSPACE FILES STATE & CORE EDITOR ENGINE
+       ========================================== */
+
+    let activeFile = "index.html";
+    const filesData = {
+        "index.html": {
+            lang: "html",
+            content: `<!DOCTYPE html>
+<html>
+<head>
+    <style>
+        body {
+            background: #090d16;
+            color: #f8fafc;
+            font-family: sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+        .container {
+            padding: 30px;
+            border-radius: 16px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            text-align: center;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+        }
+        h1 {
+            background: linear-gradient(45deg, #8b5cf6, #ec4899);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-top: 0;
+        }
+        p { color: #94a3b8; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Antigravity Live Visual</h1>
+        <p>Live preview rendered in sandbox iframe.</p>
+    </div>
+</body>
+</html>`
+        },
+        "style.css": {
+            lang: "css",
+            content: `/* Cyberpunk UI Theme */
+.container {
+    background: linear-gradient(135deg, rgba(139, 92, 246, 0.1), rgba(236, 72, 153, 0.1));
+    border: 1px solid #8b5cf6;
+    box-shadow: 0 0 20px rgba(139, 92, 246, 0.2);
+    transition: all 0.3s ease;
+}
+.container:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 0 30px rgba(139, 92, 246, 0.4);
+}`
+        },
+        "main.py": {
+            lang: "python",
+            content: `# Quick API Fetcher & Analyzer
+import json
+import time
+
+def process_data(user_id):
+    print(f"Mengambil data untuk user: {user_id}")
+    time.sleep(1)
+    
+    result = {
+        "status": "success",
+        "timestamp": int(time.time()),
+        "data": {
+            "coins": 2500,
+            "level": 4
+        }
+    }
+    return json.dumps(result)
+
+# Run process
+print(process_data("user_101"))`
+        },
+        "Index.java": {
+            lang: "java",
+            content: `// Java User Authentication Controller
+public class UserController {
+    private String username;
+    private String role;
+
+    public UserController(String username, String role) {
+        this.username = username;
+        this.role = role;
+    }
+
+    public void displayUserInfo() {
+        if (this.username == null) {
+            throw new NullPointerException("Username tidak diinisialisasi!");
+        }
+        System.out.println("User: " + this.username + " (" + this.role + ")");
+    }
+
+    public static void main(String[] args) {
+        // PERINGATAN: Null username memicu NullPointerException
+        UserController user = new UserController(null, "Biasa");
+        user.displayUserInfo();
+    }
+}`
+        }
+    };
+
+    function initWorkspaceEditor() {
+        // Load initial file (index.html)
+        loadWorkspaceFile("index.html");
+
+        // Input change listener
+        editorInput.addEventListener("input", () => {
+            filesData[activeFile].content = editorInput.value;
+            updateHighlighting();
+            updateLineNumbers();
+        });
+
+        // Scroll listener to sync editor highlight pre and line numbers
+        editorInput.addEventListener("scroll", () => {
+            editorHighlight.parentElement.scrollTop = editorInput.scrollTop;
+            editorHighlight.parentElement.scrollLeft = editorInput.scrollLeft;
+            editorLineNumbers.scrollTop = editorInput.scrollTop;
+        });
+
+        // Double tab support or tabs
+        editorInput.addEventListener("keydown", (e) => {
+            if (e.key === "Tab") {
+                e.preventDefault();
+                const start = editorInput.selectionStart;
+                const end = editorInput.selectionEnd;
+                editorInput.value = editorInput.value.substring(0, start) + "    " + editorInput.value.substring(end);
+                editorInput.selectionStart = editorInput.selectionEnd = start + 4;
+                filesData[activeFile].content = editorInput.value;
+                updateHighlighting();
+            }
+        });
+
+        // Switch files click listeners
+        const fileItems = workspaceFiles.querySelectorAll(".file-item");
+        fileItems.forEach(item => {
+            item.addEventListener("click", () => {
+                fileItems.forEach(i => i.classList.remove("active"));
+                item.classList.add("active");
+                
+                const file = item.getAttribute("data-file");
+                loadWorkspaceFile(file);
+            });
+        });
+
+        // Button action click listeners
+        btnRunPreview.addEventListener("click", () => {
+            runActiveFilePreview();
+        });
+
+        btnGenFlowchart.addEventListener("click", () => {
+            generateFlowchartForActiveFile();
+        });
+    }
+
+    function loadWorkspaceFile(filename) {
+        activeFile = filename;
+        activeFilename.textContent = filename;
+        
+        const data = filesData[filename];
+        editorInput.value = data.content;
+        editorHighlight.className = `language-${data.lang}`;
+
+        // Reset scroll position
+        editorInput.scrollTop = 0;
+        editorInput.scrollLeft = 0;
+        editorHighlight.parentElement.scrollTop = 0;
+        editorHighlight.parentElement.scrollLeft = 0;
+        editorLineNumbers.scrollTop = 0;
+
+        updateHighlighting();
+        updateLineNumbers();
+        
+        // Auto-run preview upon switching
+        runActiveFilePreview();
+    }
+
+    function updateLineNumbers() {
+        const text = editorInput.value;
+        const lineCount = text.split("\n").length || 1;
+        
+        let numbersHtml = "";
+        for (let i = 1; i <= lineCount; i++) {
+            numbersHtml += `<span>${i}</span>`;
+        }
+        editorLineNumbers.innerHTML = numbersHtml;
+    }
+
+    function updateHighlighting() {
+        const text = editorInput.value;
+        const lang = filesData[activeFile].lang;
+        editorHighlight.innerHTML = highlightCodeText(text, lang);
+    }
+
+    function highlightCodeText(text, lang) {
+        // Escape HTML
+        let escaped = escapeHTML(text);
+
+        if (lang === "html") {
+            // Highlighting comments, tags, attributes
+            escaped = escaped.replace(/(&lt;!--[\s\S]*?--&gt;)/g, '<span class="hl-comment">$1</span>');
+            escaped = escaped.replace(/(&lt;\/?[a-zA-Z0-9\-]+)(.*?)(&gt;)/g, (m, p1, p2, p3) => {
+                const attrs = p2.replace(/([a-zA-Z0-9\-]+)=(&quot;.*?&quot;)/g, '<span class="hl-attr">$1</span>=<span class="hl-string">$2</span>');
+                return `<span class="hl-tag">${p1}</span>${attrs}<span class="hl-tag">${p3}</span>`;
+            });
+            return escaped;
+        } else if (lang === "css") {
+            // CSS Highlighting
+            escaped = escaped.replace(/(\/\*[\s\S]*?\*\/)/g, '<span class="hl-comment">$1</span>');
+            escaped = escaped.replace(/([a-zA-Z0-9\-\.\#\:\s]+)\s*\{/g, '<span class="hl-tag">$1</span> {');
+            escaped = escaped.replace(/([a-zA-Z0-9\-]+)\s*:\s*(.*?)\s*;/g, '<span class="hl-attr">$1</span>: <span class="hl-string">$2</span>;');
+            return escaped;
+        } else if (lang === "python") {
+            // Python keywords, comments, strings, functions
+            escaped = escaped.replace(/(#[^\n]*)/g, '<span class="hl-comment">$1</span>');
+            escaped = escaped.replace(/\b(def|class|if|else|elif|for|while|import|from|return|in|as|time|json)\b/g, '<span class="hl-keyword">$1</span>');
+            escaped = escaped.replace(/(&quot;.*?&quot;|&#39;.*?&#39;)/g, '<span class="hl-string">$1</span>');
+            escaped = escaped.replace(/\b([a-zA-Z0-9_]+)\(/g, '<span class="hl-function">$1</span>(');
+            return escaped;
+        } else if (lang === "java") {
+            // Java keywords, comments, strings, functions
+            escaped = escaped.replace(/(\/\/.*?$)/gm, '<span class="hl-comment">$1</span>');
+            escaped = escaped.replace(/\b(public|class|private|protected|void|static|new|throw|if|else|return|null|System|out|println|String)\b/g, '<span class="hl-keyword">$1</span>');
+            escaped = escaped.replace(/(&quot;.*?&quot;)/g, '<span class="hl-string">$1</span>');
+            escaped = escaped.replace(/\b([a-zA-Z0-9_]+)\(/g, '<span class="hl-function">$1</span>(');
+            return escaped;
+        }
+        
+        return escaped;
+    }
+
+    /* ==========================================
+       VISUAL PREVIEW ENGINE
+       ========================================== */
+
+    function runActiveFilePreview() {
+        // Hide all previews first
+        previewIframe.classList.add("hidden");
+        previewConsole.classList.add("hidden");
+        previewFlowchart.classList.add("hidden");
+        
+        const data = filesData[activeFile];
+        
+        if (data.lang === "html") {
+            const cssContent = filesData["style.css"].content;
+            let htmlContent = data.content;
+            
+            // Inject css into html head
+            if (htmlContent.includes("</head>")) {
+                htmlContent = htmlContent.replace("</head>", `<style>${cssContent}</style></head>`);
+            } else {
+                htmlContent = `<style>${cssContent}</style>` + htmlContent;
+            }
+            
+            previewIframe.srcdoc = htmlContent;
+            previewIframe.classList.remove("hidden");
+            showToast("⚡ Preview HTML berhasil diperbarui!", "success");
+        } else if (data.lang === "css") {
+            showToast("ℹ️ CSS aktif - Mengalihkan preview ke index.html", "info");
+            const cssContent = data.content;
+            let htmlContent = filesData["index.html"].content;
+            
+            if (htmlContent.includes("</head>")) {
+                htmlContent = htmlContent.replace("</head>", `<style>${cssContent}</style></head>`);
+            } else {
+                htmlContent = `<style>${cssContent}</style>` + htmlContent;
+            }
+            
+            previewIframe.srcdoc = htmlContent;
+            previewIframe.classList.remove("hidden");
+        } else if (data.lang === "python") {
+            previewConsole.classList.remove("hidden");
+            consoleLogOutput.style.color = "#38bdf8";
+            consoleLogOutput.innerHTML = "Initializing python runtime...\n";
+            
+            setTimeout(() => {
+                consoleLogOutput.innerHTML += "$ python main.py\n";
+            }, 300);
+            
+            setTimeout(() => {
+                consoleLogOutput.innerHTML += "Mengambil data untuk user: user_101\n";
+            }, 800);
+            
+            setTimeout(() => {
+                consoleLogOutput.innerHTML += 'Output: {"status": "success", "timestamp": ' + Math.floor(Date.now()/1000) + ', "data": {"coins": 2500, "level": 4}}\n';
+                showToast("🐍 Python script executed successfully!", "success");
+            }, 1800);
+        } else if (data.lang === "java") {
+            previewConsole.classList.remove("hidden");
+            consoleLogOutput.style.color = "#38bdf8";
+            consoleLogOutput.innerHTML = "Compiling java controller...\n";
+            
+            setTimeout(() => {
+                consoleLogOutput.innerHTML += "$ javac UserController.java\n";
+            }, 400);
+            
+            setTimeout(() => {
+                consoleLogOutput.innerHTML += "$ java UserController\n";
+            }, 800);
+            
+            setTimeout(() => {
+                const code = data.content;
+                if (code.includes('UserController user = new UserController(null, "Biasa")') || code.includes('new UserController(null')) {
+                    consoleLogOutput.innerHTML += `Exception in thread "main" java.lang.NullPointerException: Username tidak diinisialisasi!\n\tat UserController.displayUserInfo(UserController.java:12)\n\tat UserController.main(UserController.java:18)\n`;
+                    consoleLogOutput.style.color = "#f87171";
+                    showToast("❌ Java Runtime Error: NullPointerException!", "info");
+                } else {
+                    let matchedName = "kpljk";
+                    const match = code.match(/new UserController\("(.+?)"/);
+                    if (match && match[1]) matchedName = match[1];
+                    
+                    consoleLogOutput.innerHTML += `User: ${matchedName} (Admin)\n\nExecution Finished successfully.`;
+                    consoleLogOutput.style.color = "#34d399";
+                    showToast("☕ Java execution success!", "success");
+                }
+            }, 1400);
+        }
+    }
+
+    /* ==========================================
+       FLOWCHART GENERATOR
+       ========================================== */
+
+    function generateFlowchartForActiveFile() {
+        previewIframe.classList.add("hidden");
+        previewConsole.classList.add("hidden");
+        previewFlowchart.classList.remove("hidden");
+        previewFlowchart.innerHTML = "Menganalisis file untuk Flowchart...";
+
+        const content = filesData[activeFile].content;
+        const lang = filesData[activeFile].lang;
+
+        let steps = [];
+
+        if (lang === "html") {
+            steps = [
+                { type: "start", text: "Page Load Event" },
+                { type: "process", text: "Load DOM elements" },
+                { type: "decision", text: "Has external stylesheet?" },
+                { type: "process", text: "Apply Embedded styles / style.css" },
+                { type: "process", text: "Render visual elements (Card container)" },
+                { type: "end", text: "Tampilan Halaman Utama" }
+            ];
+        } else if (lang === "css") {
+            steps = [
+                { type: "start", text: "Parse CSS Rules" },
+                { type: "process", text: "Evaluate selectors (.container, .card)" },
+                { type: "process", text: "Calculate properties (glassmorphism filter)" },
+                { type: "process", text: "Add hover listeners transition scale" },
+                { type: "end", text: "Style Rendered to Workspace" }
+            ];
+        } else if (lang === "python") {
+            steps = [
+                { type: "start", text: "Script Main Initialization" },
+                { type: "process", text: "Call process_data('user_101')" },
+                { type: "process", text: "Print fetching user data trace log" },
+                { type: "process", text: "Simulate API payload fetch (Sleep 1s)" },
+                { type: "process", text: "Compile JSON result string" },
+                { type: "end", text: "Print Output Console JSON" }
+            ];
+        } else if (lang === "java") {
+            const hasNull = content.includes('new UserController(null');
+            steps = [
+                { type: "start", text: "Java App Start (main method)" },
+                { type: "process", text: "Instantiate UserController object" },
+                { type: "process", text: "Call displayUserInfo()" },
+                { type: "decision", text: "Is username == null?" },
+                hasNull ? { type: "process", text: "Throw NullPointerException error", error: true } : { type: "process", text: "Print User data console logs" },
+                { type: "end", text: hasNull ? "Crashed & Exit (Exit Code 1)" : "Success exit (Exit Code 0)" }
+            ];
+        }
+
+        let svg = `<svg width="340" height="${steps.length * 90 + 20}" xmlns="http://www.w3.org/2000/svg" style="font-family: 'JetBrains Mono', monospace;">
+            <defs>
+                <linearGradient id="flow-node-grad" x1="0%" y1="0%" x2="100%" y2="100%">
+                    <stop offset="0%" stop-color="#8b5cf6"/>
+                    <stop offset="100%" stop-color="#ec4899"/>
+                </linearGradient>
+                <linearGradient id="flow-err-grad" x1="0%" y1="0%" x2="100%" y2="100%">
+                    <stop offset="0%" stop-color="#f43f5e"/>
+                    <stop offset="100%" stop-color="#be123c"/>
+                </linearGradient>
+            </defs>`;
+
+        steps.forEach((step, idx) => {
+            const y = idx * 90 + 20;
+            const nextY = (idx + 1) * 90 + 20;
+
+            if (idx < steps.length - 1) {
+                svg += `
+                <line x1="170" y1="${y + 46}" x2="170" y2="${nextY}" stroke="rgba(255,255,255,0.2)" stroke-width="2" />
+                <polygon points="167,${nextY - 4} 173,${nextY - 4} 170,${nextY}" fill="rgba(255,255,255,0.3)" />
+                `;
+            }
+
+            const fill = step.error ? "url(#flow-err-grad)" : "rgba(15, 23, 42, 0.9)";
+            const stroke = step.error ? "#f43f5e" : "url(#flow-node-grad)";
+
+            if (step.type === "start" || step.type === "end") {
+                svg += `<rect x="60" y="${y}" width="220" height="46" rx="23" fill="${fill}" stroke="${stroke}" stroke-width="2" />`;
+            } else if (step.type === "decision") {
+                svg += `<polygon points="170,${y} 280,${y+23} 170,${y+46} 60,${y+23}" fill="${fill}" stroke="${stroke}" stroke-width="2" />`;
+            } else {
+                svg += `<rect x="60" y="${y}" width="220" height="46" rx="8" fill="${fill}" stroke="${stroke}" stroke-width="2" />`;
+            }
+
+            svg += `<text x="170" y="${y + 27}" fill="#fff" font-size="10" font-weight="600" text-anchor="middle">${step.text}</text>`;
+        });
+
+        svg += `</svg>`;
+        
+        previewFlowchart.innerHTML = `
+            <div style="display:flex; flex-direction:column; align-items:center; width:100%;">
+                <div style="font-size:0.75rem; color:#8b5cf6; font-weight:700; margin-bottom:12px; letter-spacing:1px; text-transform:uppercase;">Flowchart: ${activeFile}</div>
+                ${svg}
+            </div>
+        `;
+        showToast("📊 Flowchart logika berhasil di-generate!", "success");
+    }
+
+    /* ==========================================
+       SPEECH RECOGNITION (VOICE CODING)
+       ========================================== */
+
+    function initVoiceCoding() {
+        if (!btnVoiceInput) return;
+
+        let SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+        if (!SpeechRecognition) {
+            btnVoiceInput.title = "Voice Input tidak didukung oleh browser ini";
+            btnVoiceInput.addEventListener("click", () => {
+                showToast("❌ Web Speech API tidak didukung pada browser ini.", "info");
+            });
+            return;
+        }
+
+        const recognition = new SpeechRecognition();
+        recognition.lang = "id-ID";
+        recognition.interimResults = false;
+        recognition.maxAlternatives = 1;
+
+        let isListening = false;
+
+        btnVoiceInput.addEventListener("click", () => {
+            if (isListening) {
+                recognition.stop();
+            } else {
+                try {
+                    recognition.start();
+                    isListening = true;
+                    btnVoiceInput.classList.add("listening");
+                    showToast("🎙️ Mendengarkan perintah suara Anda...", "system");
+                    panelMainTitle.textContent = "Listening Voice Command...";
+                } catch (e) {
+                    console.error(e);
+                    showToast("❌ Gagal memulai perekaman audio", "info");
+                }
+            }
+        });
+
+        recognition.addEventListener("result", (event) => {
+            const transcript = event.results[0][0].transcript;
+            chatInput.value = transcript;
+            showToast(`🎙️ Terdeteksi: "${transcript}"`, "success");
+            
+            setTimeout(() => {
+                chatForm.dispatchEvent(new Event("submit"));
+            }, 600);
+        });
+
+        recognition.addEventListener("end", () => {
+            isListening = false;
+            btnVoiceInput.classList.remove("listening");
+            panelMainTitle.textContent = currentUser ? "Antigravity AI Coder" : "Antigravity AI (Sign In)";
+        });
+
+        recognition.addEventListener("error", (e) => {
+            console.error(e);
+            isListening = false;
+            btnVoiceInput.classList.remove("listening");
+            panelMainTitle.textContent = currentUser ? "Antigravity AI Coder" : "Antigravity AI (Sign In)";
+            showToast("❌ Audio error atau izin mikrofon ditolak", "info");
+        });
+    }
+
+    /* ==========================================
+       BUG HUNTER & KAMUS ERROR ENGINE
+       ========================================== */
+
+    function initBugHunter() {
+        if (!btnHuntBugs) return;
+
+        btnHuntBugs.addEventListener("click", () => {
+            const errLog = terminalErrorInput.value.trim();
+            if (!errLog) {
+                showToast("❌ Mohon masukkan teks error terlebih dahulu!", "info");
+                return;
+            }
+
+            analyzeTerminalError(errLog);
+        });
+
+        btnApplyBugfix.addEventListener("click", () => {
+            applyResolvedBugfix();
+        });
+    }
+
+    let currentBugfixCode = "";
+    let currentBugfixTargetFile = "";
+
+    function analyzeTerminalError(errorText) {
+        const lower = errorText.toLowerCase();
+        let errorType = "";
+        let errorDesc = "";
+        let errorSol = "";
+        let codeBefore = "";
+        let codeAfter = "";
+        let targetFile = "";
+        
+        let matched = false;
+
+        if (lower.includes("nullpointerexception") || lower.includes("nullpointer")) {
+            matched = true;
+            errorType = "NullPointerException (Java)";
+            errorDesc = "Terjadi saat program mencoba memanggil atau mengakses objek yang mereferensikan nilai null (tidak dideklarasikan / diisi kosong).";
+            errorSol = "Inisialisasi objek UserController dengan parameter username String yang valid (bukan null) saat memanggil constructor.";
+            targetFile = "Index.java";
+            
+            codeBefore = `// Baris 18: memicu NullPointerException
+UserController user = new UserController(null, "Biasa");
+user.displayUserInfo();`;
+            
+            codeAfter = `// Diperbaiki: inisialisasi username bernilai valid
+UserController user = new UserController("kpljk", "Admin");
+user.displayUserInfo();`;
+            
+            currentBugfixCode = filesData["Index.java"].content.replace(
+                'UserController user = new UserController(null, "Biasa");',
+                'UserController user = new UserController("kpljk", "Admin");'
+            );
+            currentBugfixTargetFile = "Index.java";
+            
+        } else if (lower.includes("zerodivisionerror") || lower.includes("division by zero") || lower.includes("divided by zero")) {
+            matched = true;
+            errorType = "ZeroDivisionError (Python)";
+            errorDesc = "Terjadi ketika melakukan operasi pembagian dengan nilai pembagi (denominator) bernilai nol (0) secara langsung.";
+            errorSol = "Tambahkan pemeriksaan logis 'if division == 0' sebelum melakukan kalkulasi nilai rata-rata atau rasio data.";
+            targetFile = "main.py";
+            
+            codeBefore = `def hitung(a, b):
+    return a / b`;
+            
+            codeAfter = `def hitung(a, b):
+    if b == 0:
+        return 0
+    return a / b`;
+            
+            currentBugfixCode = filesData["main.py"].content + `\n\n# Fix ZeroDivision\ndef hitung(a, b):\n    if b == 0: return 0\n    return a / b`;
+            currentBugfixTargetFile = "main.py";
+            
+        } else if (lower.includes("cannot read properties of undefined") || lower.includes("referenceerror")) {
+            matched = true;
+            errorType = "TypeError / ReferenceError (Javascript)";
+            errorDesc = "Terjadi ketika mengakses properti dari variabel bernilai undefined atau memanggil method objek yang tidak eksis di memory.";
+            errorSol = "Gunakan optional chaining selector (?.) atau inisialisasi default object object check.";
+            targetFile = "index.html";
+            
+            codeBefore = `let name = user.profile.name; // Error jika profile undefined`;
+            codeAfter = `let name = user?.profile?.name || "Guest"; // Solusi aman`;
+            
+            currentBugfixCode = filesData["index.html"].content;
+            currentBugfixTargetFile = "index.html";
+        }
+
+        if (!matched) {
+            errorType = "Unrecognized Exception / Compilation Error";
+            errorDesc = "Terjadi kesalahan pada struktur logika syntax code atau library dependensi yang terputus saat runtime compiler.";
+            errorSol = "Periksa kesesuaian penulisan kurung tutup, nama variabel, dan versi interpreter program Anda.";
+            targetFile = activeFile;
+            
+            codeBefore = `// Terjadi error di file: ${targetFile}`;
+            codeAfter = `// Coba ganti bagian logika yang crash dan jalankan ulang compiler.`;
+            
+            currentBugfixCode = filesData[activeFile].content;
+            currentBugfixTargetFile = activeFile;
+        }
+
+        errorDetectedType.textContent = errorType;
+        errorDetectedDesc.textContent = errorDesc;
+        errorDetectedSol.textContent = errorSol;
+        
+        diffCodeBefore.textContent = codeBefore;
+        diffCodeAfter.textContent = codeAfter;
+        
+        bugAnalysisResult.classList.remove("hidden");
+        showToast("🪲 Analisis selesai! Bug & Solusi berhasil ditemukan.", "success");
+    }
+
+    function applyResolvedBugfix() {
+        if (!currentBugfixTargetFile || !currentBugfixCode) return;
+        
+        filesData[currentBugfixTargetFile].content = currentBugfixCode;
+        
+        if (activeFile === currentBugfixTargetFile) {
+            loadWorkspaceFile(activeFile);
+        } else {
+            showToast(`🔧 Perbaikan otomatis telah diterapkan ke file ${currentBugfixTargetFile}!`, "success");
+        }
+        
+        bugAnalysisResult.classList.add("hidden");
+        terminalErrorInput.value = "";
+        
+        runActiveFilePreview();
+    }
+
     // Startup Session & Database Initialization
+    initWorkspaceEditor();
+    initVoiceCoding();
+    initBugHunter();
     initUserDatabase();
     checkSession();
 });
