@@ -1157,7 +1157,10 @@ app.listen(3000, () => console.log('Server running!'));`
         const asksForCode = lower.includes("buatkan") || lower.includes("tuliskan") || lower.includes("bikin") || 
                             lower.includes("code") || lower.includes("script") || lower.includes("skrip") || 
                             lower.includes("coding") || lower.includes("program") || lower.includes("contoh") ||
-                            lower.includes("kode");
+                            lower.includes("kode") || lower.includes("cara") || lower.includes("caranya") || 
+                            lower.includes("bagaimana") || lower.includes("gimana") || lower.includes("jawaban") || 
+                            lower.includes("jawabannya") || lower.includes("solusi") || lower.includes("solusinya") || 
+                            lower.includes("tutorial");
 
         // If it's a general question and NOT explicitly asking for a code block, we give a rich text explanation
         if (isQuestion && !asksForCode) {
