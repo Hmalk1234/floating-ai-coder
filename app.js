@@ -381,6 +381,35 @@ app.listen(3000, () => console.log('Server running!'));`
 }`
                 }
             }
+        },
+        tanya: {
+            modeName: "General Q&A Assistant",
+            suggestions: [
+                { text: "Apa itu Pemrograman?", id: "tanya_programming" },
+                { text: "Cara Belajar Coding", id: "tanya_learn" },
+                { text: "Apa itu Database?", id: "tanya_db" }
+            ],
+            defaultAnswer: "Halo! Saya adalah General Q&A Assistant. Di sini Anda bisa menanyakan apa saja tentang konsep pemrograman, tips belajar coding, cara kerja database, atau teori dasar web dan game. Silakan ajukan pertanyaan Anda!",
+            responses: {
+                tanya_programming: {
+                    title: "Apa itu Pemrograman?",
+                    lang: "text",
+                    text: "Pemrograman adalah proses menulis, menguji, memperbaiki (debug), dan memelihara kode instruksi yang dijalankan oleh komputer. Kode ini ditulis menggunakan bahasa pemrograman (seperti Python, Lua, Javascript, C++) untuk memecahkan masalah atau membuat aplikasi.",
+                    code: null
+                },
+                tanya_learn: {
+                    title: "Cara Belajar Coding untuk Pemula",
+                    lang: "text",
+                    text: "1. **Pilih Satu Bahasa Pertama**: Pelajari bahasa yang ramah pemula seperti Python (aplikasi) atau Javascript (web) atau Lua (Roblox).\n2. **Pahami Dasar-dasar**: Kuasai konsep Variabel, Tipe Data, Percabangan (If-Else), dan Perulangan (Loops).\n3. **Mulai Proyek Kecil**: Buat game tebak angka, kalkulator sederhana, atau website portofolio sendiri.\n4. **Belajar Konsisten**: Luangkan waktu 30-60 menit setiap hari untuk menulis kode.",
+                    code: null
+                },
+                tanya_db: {
+                    title: "Apa itu Database (Basis Data)?",
+                    lang: "text",
+                    text: "Database adalah wadah penyimpanan data digital terstruktur di dalam komputer. Contohnya, saat Anda bermain game Roblox, koin dan level Anda disimpan di database server agar tidak hilang saat Anda keluar game. Jenis database populer adalah SQL (MySQL, PostgreSQL) dan NoSQL (MongoDB, Firebase).",
+                    code: null
+                }
+            }
         }
     };
 
@@ -981,6 +1010,64 @@ app.listen(3000, () => console.log('Server running!'));`
             return;
         }
 
+        // Q&A Category general answers
+        if (currentCategory === "tanya") {
+            const responseText = `Pertanyaan yang bagus tentang **"${escapeHTML(query)}"**!\n\nDi dalam pemrograman dan rekayasa perangkat lunak:\n\n1. **Teori Dasar**: Memahami konsep dasar dan bagaimana komponen ini bekerja.\n2. **Implementasi**: Menghubungkannya dengan alur kerja pembuatan web, game (Roblox/Unity), atau aplikasi Python.\n3. **Praktik Terbaik**: Menerapkannya secara konsisten untuk membuat program yang efisien.\n\nApakah ada aspek tertentu tentang konsep tersebut yang ingin saya jelaskan lebih jauh?`;
+            appendAIResponse("Asisten Tanya AI", responseText, null, null);
+            return;
+        }
+
+        // Conversational/Explanation checks
+        const isQuestion = lower.includes("apa") || lower.includes("bagaimana") || lower.includes("jelaskan") || 
+                           lower.includes("kenapa") || lower.includes("mengapa") || lower.includes("gimana") || 
+                           lower.includes("arti") || lower.includes("maksud") || lower.includes("tanya") || 
+                           lower.includes("cara kerja") || lower.includes("tutorial");
+                           
+        const asksForCode = lower.includes("buatkan") || lower.includes("tuliskan") || lower.includes("bikin") || 
+                            lower.includes("code") || lower.includes("script") || lower.includes("skrip") || 
+                            lower.includes("coding") || lower.includes("program") || lower.includes("contoh") ||
+                            lower.includes("kode");
+
+        // If it's a general question and NOT explicitly asking for a code block, we give a rich text explanation
+        if (isQuestion && !asksForCode) {
+            let answerText = "";
+            let title = "Penjelasan AI";
+            
+            if (currentCategory === "roblox") {
+                if (lower.includes("leaderstats") || lower.includes("leaderboard")) {
+                    answerText = "**Leaderstats** adalah sistem bawaan di Roblox untuk menampilkan data statistik pemain di pojok kanan atas layar (seperti Koin, Level, atau Nilai). Untuk membuatnya, Anda perlu menggunakan folder khusus bernama `leaderstats` yang dipasang di dalam objek Player di server.";
+                } else if (lower.includes("kill brick") || lower.includes("menyentuh") || lower.includes("part")) {
+                    answerText = "**Kill Brick** bekerja dengan mendeteksi event `.Touched` pada objek Part. Ketika objek lain menyentuhnya, skrip akan memeriksa apakah penyentuh tersebut memiliki component `Humanoid` (yang menandakan karakter pemain). Jika ada, nyawa (`Health`) humanoid tersebut diubah menjadi 0.";
+                } else {
+                    answerText = "Dalam Roblox Game Development, Luau Scripting digunakan untuk mengendalikan logika permainan. Objek dihubungkan lewat Events (seperti `.Touched`, `.Changed`) dan Services (seperti `Players`, `ReplicatedStorage`, `DataStoreService`).";
+                }
+                title = "Penjelasan Konsep Roblox";
+            } else if (currentCategory === "web") {
+                if (lower.includes("glassmorphism") || lower.includes("kaca")) {
+                    answerText = "**Glassmorphism** adalah gaya visual semi-transparan mirip kaca buram. Efek ini dicapai menggunakan CSS dengan mengatur warna latar belakang transparan (misal `rgba(255,255,255,0.1)`) dan menerapkan filter blur latar belakang lewat properti `backdrop-filter: blur(10px)`. Jangan lupa tambahkan border tipis semi-transparan untuk efek kedalaman.";
+                } else if (lower.includes("dark mode") || lower.includes("tema")) {
+                    answerText = "Penerapan **Dark Mode** di website biasanya dilakukan dengan menambahkan class (seperti `.dark`) pada tag `html` atau `body` lewat Javascript. Setelah class ditambahkan, CSS Selector khusus (atau selector Tailwind `dark:`) akan aktif dan mengganti variabel warna ke skema gelap.";
+                } else {
+                    answerText = "Pengembangan **Web Frontend** berpusat pada tiga pilar: **HTML** untuk struktur, **CSS** untuk keindahan tata letak (Flexbox, Grid, Glassmorphic), dan **Javascript** untuk logika interaktif halaman.";
+                }
+                title = "Penjelasan Konsep Web Dev";
+            } else if (currentCategory === "game") {
+                if (lower.includes("unity") || lower.includes("c#")) {
+                    answerText = "Di **Unity**, logika game ditulis menggunakan C# dengan mewarisi kelas `MonoBehaviour`. Fungsi penting seperti `Start()` berjalan sekali saat game dimulai, dan `Update()` berjalan di setiap frame game untuk mendeteksi input gerakan WASD atau klik mouse secara berkala.";
+                } else if (lower.includes("godot") || lower.includes("gdscript")) {
+                    answerText = "Di **Godot Engine**, kita menggunakan **GDScript** yang mirip Python. Objek diorganisasikan dalam bentuk Nodes dan Scene. Fungsi utama gerakan fisik biasanya ditangani di dalam fungsi `_physics_process(delta)` untuk hasil gerakan yang konsisten di semua FPS.";
+                } else {
+                    answerText = "Pengembangan game memerlukan pemahaman tentang **Game Loop** (input, update, render) serta sistem fisika untuk mendeteksi tabrakan (Collision), gaya gravitasi, dan kecerdasan buatan musuh (Enemy AI).";
+                }
+                title = "Penjelasan Konsep Game Dev";
+            } else {
+                answerText = `Sebagai asisten AI, saya dapat menjelaskan konsep pemrograman secara teori maupun praktis. Silakan tanyakan konsep spesifik tentang variabel, fungsi, database, atau integrasi API untuk kategori ${codingPresets[currentCategory].modeName}!`;
+            }
+
+            appendAIResponse(title, answerText, null, null);
+            return;
+        }
+
         if (lower.includes("roblox") || lower.includes("luau")) {
             appendAIResponse("Sistem Roblox", "Berikut adalah petunjuk membuat Script Roblox Luau. Saya juga memiliki beberapa preset siap pakai di mode tab Roblox.", `local Part = script.Parent
 Part.Touched:Connect(function(other)
@@ -1035,12 +1122,9 @@ initializeSystem();`;
         
         const safeText = text.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
 
-        msg.innerHTML = `
-            <div class="msg-avatar">🤖</div>
-            <div class="msg-bubble">
-                <p><strong>${escapeHTML(title)}</strong></p>
-                <p>${safeText}</p>
-                
+        let codeHtml = "";
+        if (code) {
+            codeHtml = `
                 <div class="code-block-wrapper">
                     <div class="code-header">
                         <span class="code-lang">${lang}</span>
@@ -1057,27 +1141,38 @@ initializeSystem();`;
                     </div>
                     <pre class="code-content-pre"><code>${escapeHTML(code)}</code></pre>
                 </div>
+            `;
+        }
+
+        msg.innerHTML = `
+            <div class="msg-avatar">🤖</div>
+            <div class="msg-bubble">
+                <p><strong>${escapeHTML(title)}</strong></p>
+                <p>${safeText}</p>
+                ${codeHtml}
             </div>
         `;
 
-        const btnCopy = msg.querySelector(".btn-copy-inline");
-        btnCopy.addEventListener("click", () => {
-            copyTextToClipboard(code);
-            showToast("📋 Kode berhasil disalin ke clipboard!", "success");
-            
-            const spanText = btnCopy.querySelector("span");
-            spanText.textContent = "Copied!";
-            btnCopy.style.color = "#10b981";
-            setTimeout(() => {
-                spanText.textContent = "Copy";
-                btnCopy.style.color = "";
-            }, 2000);
-        });
+        if (code) {
+            const btnCopy = msg.querySelector(".btn-copy-inline");
+            btnCopy.addEventListener("click", () => {
+                copyTextToClipboard(code);
+                showToast("📋 Kode berhasil disalin ke clipboard!", "success");
+                
+                const spanText = btnCopy.querySelector("span");
+                spanText.textContent = "Copied!";
+                btnCopy.style.color = "#10b981";
+                setTimeout(() => {
+                    spanText.textContent = "Copy";
+                    btnCopy.style.color = "";
+                }, 2000);
+            });
 
-        const btnExpandCode = msg.querySelector(".btn-expand-code");
-        btnExpandCode.addEventListener("click", () => {
-            openCodeModal(code, lang);
-        });
+            const btnExpandCode = msg.querySelector(".btn-expand-code");
+            btnExpandCode.addEventListener("click", () => {
+                openCodeModal(code, lang);
+            });
+        }
 
         chatMessages.appendChild(msg);
         scrollToBottom();
