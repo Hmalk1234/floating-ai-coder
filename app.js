@@ -1012,8 +1012,139 @@ app.listen(3000, () => console.log('Server running!'));`
 
         // Q&A Category general answers
         if (currentCategory === "tanya") {
-            const responseText = `Pertanyaan yang bagus tentang **"${escapeHTML(query)}"**!\n\nDi dalam pemrograman dan rekayasa perangkat lunak:\n\n1. **Teori Dasar**: Memahami konsep dasar dan bagaimana komponen ini bekerja.\n2. **Implementasi**: Menghubungkannya dengan alur kerja pembuatan web, game (Roblox/Unity), atau aplikasi Python.\n3. **Praktik Terbaik**: Menerapkannya secara konsisten untuk membuat program yang efisien.\n\nApakah ada aspek tertentu tentang konsep tersebut yang ingin saya jelaskan lebih jauh?`;
-            appendAIResponse("Asisten Tanya AI", responseText, null, null);
+            const queryTopic = query.replace(/(bagaimana|apa itu|jelaskan tentang|cara kerja|maksud dari|apa sih|apa|bagaimana cara|cara)/gi, "").trim();
+            const titleTopic = queryTopic.charAt(0).toUpperCase() + queryTopic.slice(1);
+            
+            let explanationText = "";
+            let matchedTopic = false;
+
+            if (lower.includes("database") || lower.includes("basis data") || lower.includes("db")) {
+                matchedTopic = true;
+                explanationText = `### Arsitektur & Manajemen Database (Basis Data)
+
+1. **Definisi Teknis**:
+   Database adalah sistem penyimpanan data digital yang terstruktur, dikelola, dan diakses secara terkomputerisasi. Berbeda dengan file teks biasa, database dioptimalkan untuk penanganan volume data besar dengan performa tinggi.
+
+2. **Prinsip Kerja & Tipe**:
+   * **Relational (SQL)**: Menyimpan data dalam tabel baris-kolom dengan skema kaku. Menggunakan relasi primary-foreign key. Contoh: *PostgreSQL, MySQL, SQLite*.
+   * **Non-Relational (NoSQL)**: Menyimpan data dalam dokumen JSON, pasangan key-value, atau grafik tanpa skema tetap. Contoh: *MongoDB, Redis, Firebase Firestore*.
+
+3. **Penerapan dalam Pemrograman**:
+   Logika kode terhubung ke database menggunakan **ORM (Object-Relational Mapping)** seperti Prisma atau Sequelize, atau driver native query. Koneksi dibuka menggunakan string URL (misal: \`postgresql://user:pass@localhost:5432/db\`).
+
+4. **Metode Optimasi (Best Practice)**:
+   * **Indexing**: Buat indeks pada kolom yang paling sering digunakan dalam query pencarian (\`WHERE\`) untuk mempercepat retrieval data.
+   * **Connection Pooling**: Batasi pembukaan koneksi baru secara terus-menerus dengan mendaur ulang koneksi aktif untuk menghemat memori server.
+   * **Sanitization (SQL Injection Prevention)**: Selalu gunakan parameterized queries atau ORM untuk mencegah eksekusi kode berbahaya dari input pengguna.`;
+            } else if (lower.includes("api") || lower.includes("rest") || lower.includes("http")) {
+                matchedTopic = true;
+                explanationText = `### Arsitektur API (Application Programming Interface) & REST
+
+1. **Definisi Teknis**:
+   API adalah antarmuka perangkat lunak yang memungkinkan dua atau lebih aplikasi terpisah untuk saling berkomunikasi, bertukar data, dan berinteraksi secara aman melalui protokol standar.
+
+2. **Prinsip RESTful API**:
+   REST (Representational State Transfer) menggunakan protokol HTTP dengan metode standar:
+   * \`GET\`: Mengambil data dari server.
+   * \`POST\`: Mengirimkan data baru untuk disimpan di server.
+   * \`PUT\` / \`PATCH\`: Memperbarui data yang sudah ada.
+   * \`DELETE\`: Menghapus data dari server.
+
+3. **Format Data & Struktur**:
+   REST API berkomunikasi menggunakan payload berbentuk **JSON** (JavaScript Object Notation). Struktur request terdiri dari Endpoint URL, Headers (autentikasi/konten), dan Body payload data.
+
+4. **Best Practices Pengembangan**:
+   * **Autentikasi Aman**: Amankan API menggunakan **JWT (JSON Web Token)** atau API Key di dalam Authorization Header.
+   * **Handling Status Code**: Selalu return status code HTTP yang sesuai (misal: \`200 OK\`, \`201 Created\`, \`400 Bad Request\`, \`401 Unauthorized\`, \`500 Internal Server Error\`).
+   * **Rate Limiting**: Batasi jumlah request per IP untuk mencegah serangan DDoS dan overload server.`;
+            } else if (lower.includes("oop") || lower.includes("object oriented") || lower.includes("objek")) {
+                matchedTopic = true;
+                explanationText = `### Konsep Pemrograman Berorientasi Objek (OOP)
+
+1. **Definisi Teknis**:
+   OOP adalah paradigma pemrograman yang menyusun struktur kode berdasarkan "Objek" yang menggabungkan Data (State/Property) dan Perilaku (Behavior/Method) ke dalam satu kesatuan modular.
+
+2. **Empat Pilar Utama OOP**:
+   * **Encapsulation (Enkapsulasi)**: Membatasi akses langsung ke data objek dengan menyembunyikannya (menggunakan akses modifier \`private\` atau \`protected\`) dan mengeksposnya hanya lewat method getter/setter.
+   * **Inheritance (Pewarisan)**: Mewariskan property dan method dari kelas induk (Parent Class) ke kelas anak (Child Class) untuk mencegah redundansi kode.
+   * **Polymorphism (Polimorfisme)**: Kemampuan objek untuk mengambil banyak bentuk, biasanya lewat override method induk di kelas anak agar perilakunya spesifik.
+   * **Abstraction (Abstraksi)**: Menyembunyikan detail implementasi internal yang kompleks dan hanya menampilkan interface luar yang sederhana kepada pengguna kode.
+
+3. **Best Practices Pengembangan**:
+   * **Prinsip SOLID**: Ikuti kaidah perancangan kelas yang modular (Single Responsibility, Open/Closed, dll.).
+   * **Favor Composition over Inheritance**: Pilih menggabungkan objek kecil yang fungsional daripada membuat rantai pewarisan kelas yang terlalu dalam.`;
+            } else if (lower.includes("git") || lower.includes("github") || lower.includes("version control")) {
+                matchedTopic = true;
+                explanationText = `### Git Version Control System (VCS)
+
+1. **Definisi Teknis**:
+   Git adalah sistem pengontrol versi terdistribusi yang mencatat riwayat perubahan kode sumber secara historis, memungkinkan kolaborasi tim pengembang tanpa menimpa pekerjaan satu sama lain.
+
+2. **Prinsip Kerja & Alur Git**:
+   * **Working Directory**: Tempat Anda mengedit file kode lokal secara fisik.
+   * **Staging Area**: Buffer penyimpanan sementara (\`git add\`) untuk memilih perubahan mana yang akan dimasukkan ke commit berikutnya.
+   * **Local Repository**: Riwayat commit permanen (\`git commit\`) yang disimpan secara lokal di mesin Anda.
+   * **Remote Repository**: Server pusat di cloud (seperti *GitHub, GitLab*) tempat repositori diunggah (\`git push\`) untuk kolaborasi.
+
+3. **Metode Kolaborasi (Branching)**:
+   Gunakan fitur Branch untuk membuat ruang kerja terisolasi. Fitur baru dibuat di branch sekunder (misal: \`feature/login\`), lalu digabungkan kembali ke branch utama (\`main\`) menggunakan **Pull Request** setelah melalui peninjauan kode.
+
+4. **Best Practices**:
+   * **Commit Sering & Deskriptif**: Buat commit kecil untuk satu fungsionalitas spesifik dengan pesan commit yang jelas.
+   * **Gunakan .gitignore**: Selalu abaikan folder dependensi (\`node_modules/\`), file konfigurasi lokal (\`.env\`), dan file sistem operasi (\`.DS_Store\`).`;
+            } else if (lower.includes("variabel") || lower.includes("variable") || lower.includes("fungsi") || lower.includes("function")) {
+                matchedTopic = true;
+                explanationText = `### Variabel & Fungsi dalam Algoritma Pemrograman
+
+1. **Analisis Variabel**:
+   * **Definisi**: Wadah memori berlabel untuk menyimpan nilai sementara selama eksekusi program.
+   * **Scope**: Cakupan akses variabel terbagi menjadi **Global** (dapat diakses di mana saja) dan **Local** (hanya dapat diakses di dalam blok fungsi tempat ia dideklarasikan).
+   * **Manajemen Memori**: Bahasa tingkat tinggi menggunakan *Garbage Collection* otomatis untuk menghapus variabel yang sudah tidak digunakan dari RAM.
+
+2. **Analisis Fungsi (Function)**:
+   * **Definisi**: Blok kode modular yang dirancang untuk melakukan tugas tertentu dan dapat dijalankan berulang kali.
+   * **Parameters vs Arguments**: *Parameters* adalah variabel yang dideklarasikan saat mendefinisikan fungsi, sedangkan *Arguments* adalah nilai nyata yang dikirimkan saat fungsi dipanggil.
+   * **Pure Functions**: Fungsi yang selalu menghasilkan output yang sama untuk input yang sama tanpa memicu efek samping (side effects) di luar skop fungsi tersebut.
+
+3. **Best Practices**:
+   * **Descriptive Naming**: Gunakan konvensi penamaan yang jelas (camelCase, snake_case) yang menjelaskan fungsi variabel/fungsi tersebut secara langsung.
+   * **Keep Functions Small**: Terapkan prinsip satu fungsi hanya melakukan satu tugas spesifik.`;
+            } else if (lower.includes("hosting") || lower.includes("deploy") || lower.includes("server")) {
+                matchedTopic = true;
+                explanationText = `### Hosting & Deployment Aplikasi
+
+1. **Definisi Teknis**:
+   Deployment adalah proses memindahkan aplikasi yang sudah selesai dikembangkan dari lingkungan lokal (localhost) ke lingkungan server produksi agar dapat diakses oleh publik via internet.
+
+2. **Perbedaan Tipe Hosting**:
+   * **Static Hosting**: Hanya menyajikan file statis (HTML, CSS, JS) tanpa server backend dinamis. Contoh: *Vercel, Netlify, GitHub Pages*. Sangat cepat dan murah.
+   * **Dynamic Hosting (PaaS/IaaS)**: Menjalankan server aplikasi aktif (seperti Node.js, Python, Java) dan database. Contoh: *Render, AWS EC2, Heroku*.
+   * **Serverless**: Eksekusi fungsi kode individual berdasarkan event tanpa menyewa server 24/7. Contoh: *AWS Lambda, Vercel Serverless Functions*.
+
+3. **Alur Deployment (CI/CD)**:
+   Gunakan alur otomatisasi di mana setiap kali kode dikirim (\`git push\`) ke GitHub, server CI/CD (seperti GitHub Actions) akan memicu pengujian otomatis, membangun bundel aplikasi (*build*), dan merilis versi terbaru ke server hosting secara instan.`;
+            }
+
+            // Fallback general topic compiler if no matches found
+            if (!matchedTopic) {
+                explanationText = `### Analisis Teknis: ${titleTopic}
+
+1. **Definisi & Konsep Utama**:
+   Dalam rekayasa perangkat lunak, **${titleTopic}** merujuk pada integrasi logis komponen sistem pemrograman yang mengendalikan eksekusi kode, pengolahan data, atau penyusunan struktur instruksi aplikasi.
+
+2. **Prinsip Kerja**:
+   Sistem memproses entri parameter atau variabel masukan, memvalidasi aturan logika bahasa pemrograman yang mendasarinya, lalu mengubah status penyimpanan memori atau menghasilkan output tampilan antarmuka (UI).
+
+3. **Penerapan Praktis**:
+   Diimplementasikan secara langsung di dalam kerangka kerja (framework) atau game engine (seperti Roblox Studio, Unity, Web DOM, atau modul skrip Python) untuk memecahkan problem fungsional spesifik.
+
+4. **Metode Optimasi (Best Practice)**:
+   * Jaga agar struktur logika tetap modular dan mudah dibaca (clean code).
+   * Hindari redundansi kode dengan menerapkan fungsi pembantu (helper functions).
+   * Selalu lakukan exception handling (penanganan error) untuk menjaga stabilitas program.`;
+            }
+
+            appendAIResponse(`Analisis ${titleTopic}`, explanationText, null, null);
             return;
         }
 
@@ -1035,9 +1166,9 @@ app.listen(3000, () => console.log('Server running!'));`
             
             if (currentCategory === "roblox") {
                 if (lower.includes("leaderstats") || lower.includes("leaderboard")) {
-                    answerText = "**Leaderstats** adalah sistem bawaan di Roblox untuk menampilkan data statistik pemain di pojok kanan atas layar (seperti Koin, Level, atau Nilai). Untuk membuatnya, Anda perlu menggunakan folder khusus bernama `leaderstats` yang dipasang di dalam objek Player di server.";
+                    answerText = "**Leaderstats** adalah sistem bawaan di Roblox untuk menampilkan data statistik pemain di pojok kanan atas layar (seperti Koin, Level, atau Nilai). Sistem ini dibuat menggunakan folder khusus bernama `leaderstats` yang dipasang di dalam objek Player di server.";
                 } else if (lower.includes("kill brick") || lower.includes("menyentuh") || lower.includes("part")) {
-                    answerText = "**Kill Brick** bekerja dengan mendeteksi event `.Touched` pada objek Part. Ketika objek lain menyentuhnya, skrip akan memeriksa apakah penyentuh tersebut memiliki component `Humanoid` (yang menandakan karakter pemain). Jika ada, nyawa (`Health`) humanoid tersebut diubah menjadi 0.";
+                    answerText = "**Kill Brick** mendeteksi event `.Touched` pada objek Part. Ketika objek lain menyentuhnya, skrip akan memeriksa apakah penyentuh tersebut memiliki component `Humanoid` (yang menandakan karakter pemain). Jika ada, nyawa (`Health`) humanoid tersebut diubah menjadi 0.";
                 } else {
                     answerText = "Dalam Roblox Game Development, Luau Scripting digunakan untuk mengendalikan logika permainan. Objek dihubungkan lewat Events (seperti `.Touched`, `.Changed`) dan Services (seperti `Players`, `ReplicatedStorage`, `DataStoreService`).";
                 }
