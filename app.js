@@ -547,6 +547,14 @@ app.listen(3000, () => console.log('Server running!'));`
             if (editorWin) editorWin.classList.add("hidden");
             if (previewWin) previewWin.classList.add("hidden");
             if (appDock) appDock.classList.add("hidden");
+
+            // Secure Gemini Studio: Hide toggle button and force-collapse sidebar
+            if (btnToggleSidebar) btnToggleSidebar.classList.add("hidden");
+            if (studioSidebar) studioSidebar.classList.add("hidden");
+            if (container) {
+                container.classList.remove("studio-wide");
+                container.style.width = "460px";
+            }
         } else {
             // Logged In State: Show navigation, show active view
             authContainer.classList.add("hidden");
@@ -581,6 +589,9 @@ app.listen(3000, () => console.log('Server running!'));`
                 previewWin.classList.remove("minimized");
             }
             if (appDock) appDock.classList.remove("hidden");
+
+            // Reveal Gemini Studio settings toggle upon login
+            if (btnToggleSidebar) btnToggleSidebar.classList.remove("hidden");
 
             switchCategory(currentCategory);
         }
