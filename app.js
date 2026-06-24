@@ -79,6 +79,7 @@ document.addEventListener("DOMContentLoaded", () => {
     // Role Forms Nodes
     const creatorPresetForm = document.getElementById("creator-preset-form");
     const adminUsersList = document.getElementById("admin-users-list");
+    const settingsAdminUsersList = document.getElementById("settings-admin-users-list");
 
     const codeModal = document.getElementById("code-modal");
     const modalCodeBlock = document.getElementById("modal-code-block");
@@ -825,62 +826,129 @@ app.listen(3000, () => console.log('Server running!'));`
        ========================================== */
 
     function renderAdminUsersTable() {
-        adminUsersList.innerHTML = "";
-
-        users.forEach(user => {
-            const tr = document.createElement("tr");
-            
-            // Build columns
-            const nameTd = document.createElement("td");
-            nameTd.innerHTML = `<strong>${escapeHTML(user.username)}</strong>`;
-            
-            const roleTd = document.createElement("td");
-            roleTd.innerHTML = `<span class="user-role-tag ${user.role}">${user.role}</span>`;
-            
-            const editTd = document.createElement("td");
-            // Disable role modifying on oneself or the default administrator
-            if (user.username === currentUser.username || user.username === "kpljk") {
-                editTd.innerHTML = `<span style="color: var(--text-dark); font-size: 0.7rem;">Tidak dapat diubah</span>`;
-            } else {
-                const select = document.createElement("select");
-                const roles = ["biasa", "creator", "admin"];
-                roles.forEach(r => {
-                    const opt = document.createElement("option");
-                    opt.value = r;
-                    opt.textContent = r === "biasa" ? "Biasa" : r;
-                    if (user.role === r) opt.selected = true;
-                    select.appendChild(opt);
-                });
+        // 1. Populate AI Assistant Admin Table (admin-users-list)
+        if (adminUsersList) {
+            adminUsersList.innerHTML = "";
+            users.forEach(user => {
+                const tr = document.createElement("tr");
                 
-                select.addEventListener("change", (e) => {
-                    updateUserRole(user.username, e.target.value);
-                });
-                editTd.appendChild(select);
-            }
-            
-            const delTd = document.createElement("td");
-            if (user.username === currentUser.username || user.username === "kpljk") {
-                delTd.innerHTML = `&mdash;`;
-            } else {
-                const delBtn = document.createElement("button");
-                delBtn.className = "btn-delete-user";
-                delBtn.title = "Hapus Pengguna";
-                delBtn.innerHTML = `<svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>`;
+                const nameTd = document.createElement("td");
+                nameTd.innerHTML = `<strong>${escapeHTML(user.username)}</strong>`;
                 
-                delBtn.addEventListener("click", () => {
-                    if (confirm(`Apakah Anda yakin ingin menghapus pengguna ${user.username}?`)) {
-                        deleteUser(user.username);
-                    }
-                });
-                delTd.appendChild(delBtn);
-            }
+                const roleTd = document.createElement("td");
+                roleTd.innerHTML = `<span class="user-role-tag ${user.role}">${user.role === "biasa" ? "Biasa" : user.role}</span>`;
+                
+                const editTd = document.createElement("td");
+                if (user.username === currentUser.username || user.username === "kpljk") {
+                    editTd.innerHTML = `<span style="color: var(--text-dark); font-size: 0.7rem;">Tidak dapat diubah</span>`;
+                } else {
+                    const select = document.createElement("select");
+                    select.className = "settings-select";
+                    select.style.padding = "4px 8px";
+                    select.style.fontSize = "0.72rem";
+                    select.style.width = "90px";
+                    const roles = ["biasa", "creator", "admin"];
+                    roles.forEach(r => {
+                        const opt = document.createElement("option");
+                        opt.value = r;
+                        opt.textContent = r === "biasa" ? "Biasa" : r.toUpperCase();
+                        if (user.role === r) opt.selected = true;
+                        select.appendChild(opt);
+                    });
+                    
+                    select.addEventListener("change", (e) => {
+                        updateUserRole(user.username, e.target.value);
+                    });
+                    editTd.appendChild(select);
+                }
+                
+                const delTd = document.createElement("td");
+                if (user.username === currentUser.username || user.username === "kpljk") {
+                    delTd.innerHTML = `&mdash;`;
+                } else {
+                    const delBtn = document.createElement("button");
+                    delBtn.className = "btn-delete-user";
+                    delBtn.title = "Hapus Pengguna";
+                    delBtn.innerHTML = `<svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>`;
+                    
+                    delBtn.addEventListener("click", () => {
+                        if (confirm(`Apakah Anda yakin ingin menghapus pengguna ${user.username}?`)) {
+                            deleteUser(user.username);
+                        }
+                    });
+                    delTd.appendChild(delBtn);
+                }
 
-            tr.appendChild(nameTd);
-            tr.appendChild(roleTd);
-            tr.appendChild(editTd);
-            tr.appendChild(delTd);
-            adminUsersList.appendChild(tr);
-        });
+                tr.appendChild(nameTd);
+                tr.appendChild(roleTd);
+                tr.appendChild(editTd);
+                tr.appendChild(delTd);
+                adminUsersList.appendChild(tr);
+            });
+        }
+
+        // 2. Populate Control Center Settings Admin Table (settings-admin-users-list)
+        if (settingsAdminUsersList) {
+            settingsAdminUsersList.innerHTML = "";
+            users.forEach(user => {
+                const tr = document.createElement("tr");
+                
+                const nameTd = document.createElement("td");
+                nameTd.innerHTML = `<strong>${escapeHTML(user.username)}</strong>`;
+                
+                const roleTd = document.createElement("td");
+                roleTd.innerHTML = `<span class="user-role-badge ${user.role}">${user.role === "biasa" ? "Biasa" : user.role}</span>`;
+                
+                const editTd = document.createElement("td");
+                if (user.username === currentUser.username || user.username === "kpljk") {
+                    editTd.innerHTML = `<span style="color: var(--text-dark); font-size: 0.7rem;">Tidak dapat diubah</span>`;
+                } else {
+                    const select = document.createElement("select");
+                    select.className = "settings-select";
+                    select.style.padding = "4px 8px";
+                    select.style.fontSize = "0.72rem";
+                    select.style.width = "90px";
+                    const roles = ["biasa", "creator", "admin"];
+                    roles.forEach(r => {
+                        const opt = document.createElement("option");
+                        opt.value = r;
+                        opt.textContent = r === "biasa" ? "Biasa" : r.toUpperCase();
+                        if (user.role === r) opt.selected = true;
+                        select.appendChild(opt);
+                    });
+                    
+                    select.addEventListener("change", (e) => {
+                        updateUserRole(user.username, e.target.value);
+                    });
+                    editTd.appendChild(select);
+                }
+                
+                const delTd = document.createElement("td");
+                if (user.username === currentUser.username || user.username === "kpljk") {
+                    delTd.innerHTML = `&mdash;`;
+                } else {
+                    const delBtn = document.createElement("button");
+                    delBtn.className = "btn-settings-action";
+                    delBtn.style.padding = "4px 8px";
+                    delBtn.style.fontSize = "0.72rem";
+                    delBtn.style.background = "rgba(244,63,94,0.1)";
+                    delBtn.textContent = "Delete";
+                    
+                    delBtn.addEventListener("click", () => {
+                        if (confirm(`Apakah Anda yakin ingin menghapus pengguna ${user.username}?`)) {
+                            deleteUser(user.username);
+                        }
+                    });
+                    delTd.appendChild(delBtn);
+                }
+
+                tr.appendChild(nameTd);
+                tr.appendChild(roleTd);
+                tr.appendChild(editTd);
+                tr.appendChild(delTd);
+                settingsAdminUsersList.appendChild(tr);
+            });
+        }
     }
 
     function updateUserRole(username, newRole) {
@@ -891,8 +959,15 @@ app.listen(3000, () => console.log('Server running!'));`
             return u;
         });
         localStorage.setItem("app_users", JSON.stringify(users));
+        
+        // If the modified user is the active logged-in user, update session
+        if (currentUser && currentUser.username.toLowerCase() === username.toLowerCase()) {
+            currentUser.role = newRole;
+            localStorage.setItem("app_current_user", JSON.stringify(currentUser));
+        }
+
         showToast(`⚙️ Role ${username} diubah ke ${newRole}`, "success");
-        renderAdminUsersTable();
+        checkSession();
     }
 
     function deleteUser(username) {
@@ -5029,22 +5104,9 @@ user.displayUserInfo();`;
         localStorage.setItem("app_theme", theme);
     }
 
-    // Admin Account Actions
+    // Bind local admin functions to window for any inline html calls
     window.updateUserRole = function(username, newRole) {
-        const userIdx = users.findIndex(u => u.username === username);
-        if (userIdx !== -1) {
-            users[userIdx].role = newRole;
-            localStorage.setItem("app_users", JSON.stringify(users));
-            
-            // If the modified user is the active logged-in user, update session
-            if (currentUser && currentUser.username === username) {
-                currentUser.role = newRole;
-                localStorage.setItem("app_current_user", JSON.stringify(currentUser));
-            }
-            
-            checkSession();
-            showToast(`👤 Role ${username} berhasil diubah ke ${newRole.toUpperCase()}!`, "success");
-        }
+        updateUserRole(username, newRole);
     };
     
     window.deleteUserAccount = function(username) {
@@ -5052,46 +5114,11 @@ user.displayUserInfo();`;
             showToast("❌ Anda tidak dapat menghapus akun Anda sendiri!", "info");
             return;
         }
-        
-        const userIdx = users.findIndex(u => u.username === username);
-        if (userIdx !== -1) {
-            users.splice(userIdx, 1);
-            localStorage.setItem("app_users", JSON.stringify(users));
-            renderAdminUsersTable();
-            showToast(`❌ Akun ${username} berhasil dihapus!`, "success");
-        }
+        deleteUser(username);
     };
 
     window.renderAdminUsersTable = function() {
-        const listBody = document.getElementById("settings-admin-users-list");
-        if (!listBody) return;
-        listBody.innerHTML = "";
-        
-        users.forEach(user => {
-            const row = document.createElement("tr");
-            
-            // Dropdown to change role
-            let optionsHtml = "";
-            ["biasa", "creator", "admin"].forEach(r => {
-                const selected = user.role === r ? "selected" : "";
-                optionsHtml += `<option value="${r}" ${selected}>${r.toUpperCase()}</option>`;
-            });
-            
-            row.innerHTML = `
-                <td><strong>${escapeHTML(user.username)}</strong></td>
-                <td><span class="user-role-badge ${user.role}">${user.role === "biasa" ? "Biasa" : user.role}</span></td>
-                <td>
-                    <select class="settings-select" style="padding: 4px 8px; font-size: 0.72rem; width: 90px;" onchange="updateUserRole('${user.username}', this.value)">
-                        ${optionsHtml}
-                    </select>
-                </td>
-                <td>
-                    <button class="btn-settings-action" style="padding: 4px 8px; font-size: 0.72rem; background: rgba(244,63,94,0.1);" onclick="deleteUserAccount('${user.username}')">Delete</button>
-                </td>
-            `;
-            
-            listBody.appendChild(row);
-        });
+        renderAdminUsersTable();
     };
 
     // Startup Session & Database Initialization
