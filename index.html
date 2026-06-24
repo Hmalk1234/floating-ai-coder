@@ -125,6 +125,12 @@
             </div>
 
             <div class="header-window-actions">
+                <button id="btn-toggle-sidebar" class="action-btn" title="Gemini Studio Settings" style="margin-right: 6px;">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                        <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+                        <line x1="9" y1="3" x2="9" y2="21"></line>
+                    </svg>
+                </button>
                 <button id="btn-minimize" class="action-btn" title="Minimize">
                     <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><line x1="5" y1="12" x2="19" y2="12"></line></svg>
                 </button>
@@ -134,33 +140,75 @@
             </div>
         </header>
 
-        <!-- Category Tabs (Conditional rendering handled in JS) -->
-        <nav class="category-tabs" id="category-tabs-bar">
-            <button class="tab-btn active" data-category="roblox">
-                <span class="tab-icon">⚡</span> Roblox
-            </button>
-            <button class="tab-btn" data-category="web">
-                <span class="tab-icon">🌐</span> Web
-            </button>
-            <button class="tab-btn" data-category="game">
-                <span class="tab-icon">🎮</span> Game
-            </button>
-            <button class="tab-btn" data-category="app">
-                <span class="tab-icon">📱</span> App
-            </button>
-            <button class="tab-btn" data-category="tanya">
-                <span class="tab-icon">❓</span> Tanya AI
-            </button>
-            <button class="tab-btn" data-category="bughunter">
-                <span class="tab-icon">🪲</span> Bug Hunter
-            </button>
-            <button class="tab-btn creator-tab hidden" data-category="creator">
-                <span class="tab-icon">🎨</span> Creator
-            </button>
-            <button class="tab-btn admin-tab hidden" data-category="admin">
-                <span class="tab-icon">🛠️</span> Admin
-            </button>
-        </nav>
+        <div class="panel-container-body" id="panel-container-body">
+        <!-- Gemini Studio Sidebar (Left Side, Collapsible) -->
+        <aside class="studio-sidebar" id="studio-sidebar">
+            <div class="sidebar-section">
+                <h4 class="section-title">🤖 Model Settings</h4>
+                <div class="form-group">
+                    <label for="gemini-model-select">Model</label>
+                    <select id="gemini-model-select" class="studio-select">
+                        <option value="gemini-1.5-flash" selected>Gemini 1.5 Flash (Speed)</option>
+                        <option value="gemini-1.5-pro">Gemini 1.5 Pro (Reasoning)</option>
+                        <option value="gemini-2.0-flash">Gemini 2.0 Flash (Advanced)</option>
+                        <option value="gemini-2.5-pro">Gemini 2.5 Pro (Experimental)</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label style="display: flex; justify-content: space-between;">
+                        <span>Temperature</span>
+                        <span id="temp-val-display">1.0</span>
+                    </label>
+                    <input type="range" id="gemini-temp-slider" min="0" max="2" step="0.1" value="1.0" class="studio-slider">
+                </div>
+            </div>
+
+            <div class="sidebar-section">
+                <h4 class="section-title">📝 System Instructions</h4>
+                <textarea id="system-instructions-input" placeholder="Tulis instruksi sistem untuk memandu AI..." class="studio-textarea">Anda adalah asisten coding ahli mirip Gemini AI Studio. Anda bisa membuat aplikasi web, game, dan app interaktif yang indah, modern, dan langsung berjalan dengan performa tinggi. Berikan penjelasan singkat, lalu ikuti dengan file kode yang lengkap.</textarea>
+            </div>
+
+            <div class="sidebar-section">
+                <h4 class="section-title">✨ Studio Quick-Build</h4>
+                <div class="quick-build-grid">
+                    <button class="quick-build-btn" data-prompt="Buatkan game Flappy Bird interaktif yang modern dengan rintangan neon, skor, tombol play, dan suara tabrakan (beep)">🎮 Flappy Bird</button>
+                    <button class="quick-build-btn" data-prompt="Buatkan game Snake retro dengan efek glow modern, sistem skor tertinggi, dan pilihan tingkat kesulitan">🐍 Snake Game</button>
+                    <button class="quick-build-btn" data-prompt="Buatkan game Brick Breaker / Pong modern dengan power-ups, paddle keren, dan efek partikel pecah">🧱 Brick Breaker</button>
+                    <button class="quick-build-btn" data-prompt="Buatkan aplikasi kalkulator ilmiah premium bergaya glassmorphism dengan riwayat perhitungan dan animasi tombol">📊 Sci Calculator</button>
+                    <button class="quick-build-btn" data-prompt="Buatkan Dashboard Cuaca interaktif yang menampilkan grafik suhu, kelembaban, dan rekomendasi aktivitas berbasis cuaca saat ini">☀️ Weather App</button>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Main Panel Content Area -->
+        <div class="panel-main-content" id="panel-main-content">
+            <!-- Category Tabs (Always visible, admin/creator shown by default) -->
+            <nav class="category-tabs" id="category-tabs-bar">
+                <button class="tab-btn active" data-category="roblox">
+                    <span class="tab-icon">⚡</span> Roblox
+                </button>
+                <button class="tab-btn" data-category="web">
+                    <span class="tab-icon">🌐</span> Web
+                </button>
+                <button class="tab-btn" data-category="game">
+                    <span class="tab-icon">🎮</span> Game
+                </button>
+                <button class="tab-btn" data-category="app">
+                    <span class="tab-icon">📱</span> App
+                </button>
+                <button class="tab-btn" data-category="tanya">
+                    <span class="tab-icon">❓</span> Tanya AI
+                </button>
+                <button class="tab-btn" data-category="bughunter">
+                    <span class="tab-icon">🪲</span> Bug Hunter
+                </button>
+                <button class="tab-btn creator-tab" data-category="creator">
+                    <span class="tab-icon">🎨</span> Creator
+                </button>
+                <button class="tab-btn admin-tab" data-category="admin">
+                    <span class="tab-icon">🛠️</span> Admin
+                </button>
+            </nav>
 
         <!-- Panel Body: Contains Forms, Chat Log, Studio & Admin dashboard views -->
         <div id="chat-body" class="panel-body">
@@ -344,7 +392,17 @@
 
         <!-- Panel Footer (Only visible once logged in & chat content is selected) -->
         <footer class="panel-footer" id="panel-footer-bar">
+            <!-- Media Attachment Preview Container -->
+            <div id="media-preview-container" class="media-preview-container hidden"></div>
+            
             <form id="chat-form" class="chat-input-area">
+                <button type="button" id="btn-attach-file" class="btn-attach-file" title="Unggah Foto / Video (Simulasi)">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"></path>
+                    </svg>
+                </button>
+                <input type="file" id="media-attachment-input" accept="image/*,video/*" class="hidden" style="display: none;">
+                
                 <button type="button" id="btn-voice-input" class="btn-voice-mic" title="Voice Coding (Bicara)">
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
                         <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"></path>
@@ -379,6 +437,11 @@
                 </button>
             </div>
         </footer>
+        </div> <!-- End of .panel-main-content -->
+        </div> <!-- End of .panel-container-body -->
+        
+        <!-- Premium Neon Drag/Resize Handles -->
+        <div class="resize-handle" id="floating-resize-handle" title="Ubah Ukuran Panel"></div>
     </div>
 
     <!-- MINIMIZED BUBBLE (TRIGGER TO RESTORE) -->

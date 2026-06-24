@@ -1925,3 +1925,266 @@ body {
     cursor: pointer;
 }
 
+/* ==========================================
+   GEMINI AI STUDIO LAYOUT & SIDEBAR STYLES
+   ========================================== */
+
+.panel-container-body {
+    display: flex;
+    flex-direction: row;
+    flex: 1;
+    overflow: hidden;
+    width: 100%;
+    height: calc(100% - 56px); /* Subtract header height */
+    background: transparent;
+}
+
+.panel-main-content {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    height: 100%;
+    overflow: hidden;
+    min-width: 300px;
+    position: relative;
+}
+
+/* Gemini Studio Collapsible Sidebar */
+.studio-sidebar {
+    width: 280px;
+    background: rgba(9, 13, 22, 0.65);
+    border-right: 1px solid rgba(255, 255, 255, 0.07);
+    display: flex;
+    flex-direction: column;
+    padding: 16px;
+    gap: 16px;
+    overflow-y: auto;
+    overflow-x: hidden;
+    transition: width 0.35s cubic-bezier(0.4, 0, 0.2, 1), padding 0.35s, opacity 0.3s, border-color 0.3s;
+    flex-shrink: 0;
+    box-shadow: inset -5px 0 15px rgba(0, 0, 0, 0.2);
+}
+
+.studio-sidebar.hidden {
+    width: 0;
+    padding: 16px 0;
+    opacity: 0;
+    pointer-events: none;
+    border-right: 1px solid transparent;
+}
+
+.sidebar-section {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+    padding-bottom: 14px;
+}
+
+.sidebar-section:last-child {
+    border-bottom: none;
+    padding-bottom: 0;
+}
+
+.section-title {
+    font-size: 0.8rem;
+    font-weight: 700;
+    color: var(--text-main);
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    background: linear-gradient(135deg, #a78bfa 0%, #f472b6 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.studio-select {
+    width: 100%;
+    background: rgba(15, 23, 42, 0.85);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    color: var(--text-main);
+    border-radius: 8px;
+    padding: 8px 12px;
+    font-size: 0.8rem;
+    outline: none;
+    cursor: pointer;
+    transition: border-color 0.2s;
+}
+
+.studio-select:focus {
+    border-color: var(--theme-primary);
+    box-shadow: 0 0 10px var(--theme-glow);
+}
+
+.studio-slider {
+    width: 100%;
+    accent-color: var(--theme-primary);
+    cursor: pointer;
+    height: 6px;
+    border-radius: 3px;
+    background: rgba(255, 255, 255, 0.1);
+}
+
+.studio-textarea {
+    width: 100%;
+    height: 95px;
+    background: rgba(15, 23, 42, 0.85);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    color: var(--text-main);
+    border-radius: 8px;
+    padding: 10px;
+    font-size: 0.78rem;
+    line-height: 1.4;
+    resize: none;
+    outline: none;
+    font-family: inherit;
+    transition: border-color 0.2s;
+}
+
+.studio-textarea:focus {
+    border-color: var(--theme-primary);
+    box-shadow: 0 0 10px var(--theme-glow);
+}
+
+/* Quick-build action buttons */
+.quick-build-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 6px;
+}
+
+.quick-build-btn {
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    color: var(--text-muted);
+    padding: 6px 10px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 0.72rem;
+    text-align: left;
+    transition: all 0.2s;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.quick-build-btn:hover {
+    background: rgba(139, 92, 246, 0.15);
+    border-color: var(--theme-primary);
+    color: var(--text-main);
+    transform: translateX(3px);
+}
+
+/* ==========================================
+   RESIZE HANDLE & DRAG STYLINGS
+   ========================================== */
+
+.resize-handle {
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    width: 16px;
+    height: 16px;
+    cursor: se-resize;
+    z-index: 1001;
+    background: linear-gradient(135deg, transparent 50%, var(--theme-primary) 50%);
+    border-bottom-right-radius: 20px;
+    opacity: 0.6;
+    transition: opacity 0.2s;
+}
+
+.resize-handle:hover {
+    opacity: 1;
+    filter: drop-shadow(0 0 4px var(--theme-primary));
+}
+
+/* ==========================================
+   MEDIA ATTACHMENTS & PREVIEW STYLES
+   ========================================== */
+
+.btn-attach-file {
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    color: var(--text-muted);
+    width: 38px;
+    height: 38px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: var(--transition-fast);
+    flex-shrink: 0;
+}
+
+.btn-attach-file:hover {
+    background: rgba(255, 255, 255, 0.08);
+    color: var(--text-main);
+}
+
+.media-preview-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    padding: 8px 12px;
+    background: rgba(0, 0, 0, 0.25);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+    width: 100%;
+}
+
+.media-preview-item {
+    position: relative;
+    width: 54px;
+    height: 54px;
+    border-radius: 6px;
+    border: 1px solid var(--theme-primary);
+    box-shadow: 0 0 8px var(--theme-glow);
+    overflow: hidden;
+}
+
+.media-preview-item img,
+.media-preview-item video {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.btn-remove-media {
+    position: absolute;
+    top: 2px;
+    right: 2px;
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    background: rgba(244, 63, 94, 0.85);
+    color: #fff;
+    border: none;
+    font-size: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    font-weight: 800;
+    line-height: 1;
+}
+
+.btn-remove-media:hover {
+    background: #f43f5e;
+}
+
+/* User role tags always visible styling */
+.category-tabs .tab-btn {
+    opacity: 0.85;
+}
+.category-tabs .tab-btn:hover {
+    opacity: 1;
+}
+
+/* Responsive adjustment when wide */
+@media (min-width: 900px) {
+    .floating-panel.studio-wide {
+        width: 800px !important;
+    }
+}
+
+
