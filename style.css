@@ -2183,8 +2183,406 @@ body {
 /* Responsive adjustment when wide */
 @media (min-width: 900px) {
     .floating-panel.studio-wide {
-        width: 800px !important;
+        width: 850px !important;
     }
 }
+
+/* ==========================================
+   LINUX DESKTOP ENVIRONMENT SHELL
+   ========================================== */
+
+.linux-desktop {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    overflow: hidden;
+    background: #110d1a; /* Base dark Ubuntu aubergine */
+    display: flex;
+    flex-direction: column;
+    z-index: 1;
+}
+
+.desktop-wallpaper {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 2;
+    pointer-events: none;
+    /* Rich organic Ubuntu-like wallpaper gradient */
+    background: 
+        radial-gradient(circle at 15% 15%, rgba(119, 36, 85, 0.45) 0%, transparent 55%),
+        radial-gradient(circle at 85% 85%, rgba(44, 13, 63, 0.6) 0%, transparent 60%),
+        radial-gradient(circle at 50% 50%, rgba(22, 10, 48, 0.95) 0%, #0d0614 100%);
+}
+
+.workspace-container {
+    position: relative;
+    flex: 1;
+    width: 100%;
+    height: calc(100% - 28px - 68px); /* Top bar (28px) + Dock (68px) space */
+    margin-top: 0;
+    padding: 20px;
+    z-index: 3;
+    display: block; /* Free layout, no longer a strict grid */
+}
+
+/* ==========================================
+   LINUX TOP STATUS BAR (GNOME STYLE)
+   ========================================== */
+
+.top-status-bar {
+    height: 28px;
+    background: rgba(10, 5, 15, 0.82);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 16px;
+    font-size: 0.78rem;
+    font-weight: 600;
+    color: #e2e8f0;
+    z-index: 1000;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.4);
+    user-select: none;
+}
+
+.top-bar-left {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+}
+
+.activities-btn {
+    cursor: pointer;
+    transition: var(--transition-fast);
+    padding: 2px 8px;
+    border-radius: 4px;
+}
+
+.activities-btn:hover {
+    background: rgba(255, 255, 255, 0.08);
+    color: #fff;
+}
+
+.app-menu-btn {
+    font-weight: 700;
+    color: #f97316; /* Orange accent */
+}
+
+.top-bar-center {
+    font-family: inherit;
+    letter-spacing: 0.2px;
+    cursor: pointer;
+    padding: 2px 8px;
+    border-radius: 4px;
+    transition: var(--transition-fast);
+}
+
+.top-bar-center:hover {
+    background: rgba(255, 255, 255, 0.08);
+}
+
+.top-bar-right {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.status-icon {
+    font-size: 0.85rem;
+    opacity: 0.85;
+    cursor: pointer;
+}
+
+.quick-settings-toggle {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    cursor: pointer;
+    background: rgba(255, 255, 255, 0.04);
+    padding: 1px 8px;
+    border-radius: 20px;
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    position: relative;
+    transition: var(--transition-fast);
+}
+
+.quick-settings-toggle:hover {
+    background: rgba(255, 255, 255, 0.08);
+}
+
+.user-avatar {
+    font-size: 0.8rem;
+}
+
+.user-status-dot {
+    width: 6px;
+    height: 6px;
+    background: #10b981;
+    border-radius: 50%;
+    display: inline-block;
+    box-shadow: 0 0 6px #10b981;
+}
+
+/* ==========================================
+   LINUX PREMIUM DRAGGABLE WINDOWS (GTK STYLE)
+   ========================================== */
+
+.linux-window {
+    position: absolute;
+    background: rgba(18, 14, 28, 0.85) !important; /* Premium Ubuntu Dark Theme */
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.09) !important;
+    border-radius: 14px !important;
+    box-shadow: 
+        0 4px 30px rgba(0, 0, 0, 0.5),
+        0 25px 60px rgba(0, 0, 0, 0.45),
+        inset 0 1px 1px rgba(255, 255, 255, 0.12) !important;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    z-index: 50;
+    /* Minimize/restore animations */
+    transition: 
+        transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1),
+        opacity 0.25s ease,
+        width 0.2s ease,
+        height 0.2s ease;
+}
+
+.linux-window.active-window {
+    z-index: 90;
+    border-color: rgba(139, 92, 246, 0.3) !important;
+    box-shadow: 
+        0 4px 30px rgba(0, 0, 0, 0.5),
+        0 30px 80px rgba(0, 0, 0, 0.6),
+        0 0 20px rgba(139, 92, 246, 0.2),
+        inset 0 1px 1px rgba(255, 255, 255, 0.18) !important;
+}
+
+.linux-window.minimized {
+    transform: scale(0.7) translateY(120px);
+    opacity: 0;
+    pointer-events: none;
+}
+
+.linux-window.maximized {
+    top: 38px !important;
+    left: 10px !important;
+    width: calc(100vw - 20px) !important;
+    height: calc(100vh - 28px - 68px - 20px) !important;
+    border-radius: 8px !important;
+}
+
+/* Specific Jendela Coordinates on Desktop */
+#window-explorer {
+    width: 240px;
+    height: 480px;
+    left: 40px;
+    top: 50px;
+}
+
+#window-editor {
+    width: 600px;
+    height: 520px;
+    left: 300px;
+    top: 50px;
+}
+
+#window-preview {
+    width: 500px;
+    height: 520px;
+    left: 920px;
+    top: 50px;
+}
+
+/* Linux Window Header Bar (Client-Side Decoration) */
+.window-header {
+    height: 40px;
+    padding: 0 14px;
+    background: rgba(30, 24, 45, 0.8) !important; /* Auburn slate window header */
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05) !important;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    cursor: grab;
+    user-select: none;
+    flex-shrink: 0;
+}
+
+.window-header:active {
+    cursor: grabbing;
+}
+
+.window-title {
+    font-size: 0.82rem;
+    font-weight: 700;
+    color: #f1f5f9;
+    letter-spacing: 0.2px;
+    text-align: center;
+    flex: 1;
+    pointer-events: none;
+}
+
+/* Linux Style Window Control Buttons (Red, Yellow, Green) */
+.window-controls {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    z-index: 10;
+}
+
+.win-btn {
+    border: none;
+    background: transparent;
+    font-size: 0.62rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    line-height: 1;
+    margin: 0;
+    padding: 0;
+    transition: transform 0.15s;
+    user-select: none;
+}
+
+.win-btn:hover {
+    transform: scale(1.15);
+}
+
+.win-close {
+    color: transparent;
+    background-color: #ef4444; /* Ubuntu Red */
+    box-shadow: 0 0 4px rgba(239, 68, 68, 0.5);
+}
+.win-close:hover { color: rgba(0,0,0,0.55); }
+
+.win-min {
+    color: transparent;
+    background-color: #f59e0b; /* Ubuntu Orange/Yellow */
+    box-shadow: 0 0 4px rgba(245, 158, 11, 0.5);
+}
+.win-min:hover { color: rgba(0,0,0,0.55); }
+
+.win-max {
+    color: transparent;
+    background-color: #10b981; /* Ubuntu Green */
+    box-shadow: 0 0 4px rgba(16, 185, 129, 0.5);
+}
+.win-max:hover { color: rgba(0,0,0,0.55); }
+
+/* Remove old header window actions from workspace editor header to make it clean */
+#window-editor .window-actions {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    z-index: 10;
+}
+
+/* Explorer Body & Explorer window specific */
+.sidebar-body {
+    flex: 1;
+    overflow-y: auto;
+    padding: 12px;
+}
+
+/* ==========================================
+   LINUX BOTTOM APPLICATION DOCK (TASKBAR)
+   ========================================== */
+
+.application-dock {
+    position: absolute;
+    bottom: 12px;
+    left: 50%;
+    transform: translateX(-50%) translateY(0);
+    z-index: 1000;
+    pointer-events: auto;
+    user-select: none;
+    transition: transform 0.3s;
+}
+
+.dock-wrapper {
+    display: flex;
+    gap: 12px;
+    background: rgba(18, 10, 30, 0.55); /* Ubuntu-toned translucent dock */
+    backdrop-filter: blur(25px);
+    -webkit-backdrop-filter: blur(25px);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    padding: 8px 16px;
+    border-radius: 20px;
+    align-items: center;
+    box-shadow: 
+        0 10px 40px rgba(0, 0, 0, 0.55),
+        inset 0 1px 1px rgba(255, 255, 255, 0.15);
+}
+
+.dock-item {
+    background: transparent;
+    border: none;
+    font-size: 1.55rem;
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    position: relative;
+    width: 46px;
+    height: 46px;
+    justify-content: center;
+    border-radius: 12px;
+    transition: all 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.dock-item:hover {
+    background: rgba(255, 255, 255, 0.08);
+    transform: translateY(-8px) scale(1.15);
+}
+
+.dock-item:active {
+    transform: scale(0.95);
+}
+
+.dock-separator {
+    width: 1px;
+    height: 28px;
+    background: rgba(255, 255, 255, 0.15);
+    margin: 0 4px;
+}
+
+.dock-dot {
+    position: absolute;
+    bottom: 2px;
+    width: 5px;
+    height: 5px;
+    background: #94a3b8;
+    border-radius: 50%;
+    opacity: 0;
+    transition: all 0.2s;
+}
+
+.dock-item.active .dock-dot {
+    opacity: 1;
+    background: #f97316; /* Ubuntu Orange for active app dot */
+    box-shadow: 0 0 6px #ea580c;
+}
+
+.dock-item.focused .dock-dot {
+    width: 14px;
+    height: 4px;
+    border-radius: 2px;
+    background: #fff;
+    box-shadow: 0 0 8px #fff;
+}
+
 
 

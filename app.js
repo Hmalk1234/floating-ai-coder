@@ -4442,6 +4442,237 @@ user.displayUserInfo();`;
         });
     }
 
+    /* ==========================================
+       LINUX WINDOW MANAGER & DESKTOP ENVIRONMENT LOGIC
+       ========================================== */
+
+    let maxZIndex = 100;
+
+    function getDockIdForWindow(winId) {
+        if (winId === "window-explorer") return "dock-explorer";
+        if (winId === "window-editor") return "dock-editor";
+        if (winId === "window-preview") return "dock-preview";
+        if (winId === "floating-ai-container") return "dock-ai";
+        return null;
+    }
+
+    function focusWindow(winEl) {
+        if (!winEl) return;
+        
+        // Remove active-window class from all windows
+        document.querySelectorAll(".linux-window, .floating-panel").forEach(w => {
+            w.classList.remove("active-window");
+        });
+        
+        // Add active class and bring to front
+        winEl.classList.add("active-window");
+        maxZIndex += 1;
+        winEl.style.zIndex = maxZIndex;
+
+        // Update dock focus styles
+        document.querySelectorAll(".dock-item").forEach(item => {
+            item.classList.remove("focused");
+        });
+        
+        const targetDockId = getDockIdForWindow(winEl.id);
+        if (targetDockId) {
+            const dockItem = document.getElementById(targetDockId);
+            if (dockItem) {
+                dockItem.classList.add("focused");
+                dockItem.classList.add("active"); // Ensure active indicator dot is lit
+            }
+        }
+    }
+
+    // Register global toggleWindow and maximizeWindow on the window object so inline HTML onclick handlers work
+    window.toggleWindow = function(windowId) {
+        const win = document.getElementById(windowId);
+        if (!win) return;
+        
+        const dockId = getDockIdForWindow(windowId);
+        const dockItem = document.getElementById(dockId);
+
+        // Special handling for main AI container to match bubble trigger
+        if (windowId === "floating-ai-container") {
+            const triggerBubble = document.getElementById("floating-trigger");
+            if (win.classList.contains("minimized") || win.classList.contains("hidden") || !win.classList.contains("active")) {
+                win.classList.remove("minimized");
+                win.classList.remove("hidden");
+                win.classList.add("active");
+                if (triggerBubble) triggerBubble.classList.add("hidden");
+                if (dockItem) {
+                    dockItem.classList.add("active");
+                }
+                focusWindow(win);
+            } else {
+                if (!win.classList.contains("active-window")) {
+                    focusWindow(win);
+                } else {
+                    win.classList.add("minimized");
+                    win.classList.remove("active");
+                    if (triggerBubble) triggerBubble.classList.remove("hidden");
+                    if (dockItem) {
+                        dockItem.classList.remove("active");
+                        dockItem.classList.remove("focused");
+                    }
+                }
+            }
+            return;
+        }
+
+        // Standard windows (Explorer, Editor, Preview)
+        if (win.classList.contains("minimized") || win.classList.contains("hidden") || win.style.display === "none") {
+            win.classList.remove("minimized");
+            win.classList.remove("hidden");
+            win.style.display = "";
+            if (dockItem) {
+                dockItem.classList.add("active");
+            }
+            focusWindow(win);
+            showToast(`📂 Membuka ${win.querySelector(".window-title")?.textContent || 'Jendela'}`, "system");
+        } else {
+            if (!win.classList.contains("active-window")) {
+                focusWindow(win);
+            } else {
+                win.classList.add("minimized");
+                if (dockItem) {
+                    dockItem.classList.remove("active");
+                    dockItem.classList.remove("focused");
+                }
+            }
+        }
+    };
+
+    window.maximizeWindow = function(windowId) {
+        const win = document.getElementById(windowId);
+        if (!win) return;
+        
+        win.classList.toggle("maximized");
+        focusWindow(win);
+    };
+
+    // Bind click focus listeners to all window panels
+    const windowIds = ["window-explorer", "window-editor", "window-preview", "floating-ai-container"];
+    windowIds.forEach(id => {
+        const win = document.getElementById(id);
+        if (win) {
+            win.addEventListener("mousedown", () => focusWindow(win));
+            win.addEventListener("touchstart", () => focusWindow(win), { passive: true });
+        }
+    });
+
+    // Setup drag listeners for Linux client-side decoration headers
+    const draggableWindows = [
+        { winId: "window-explorer", headerId: "header-explorer" },
+        { winId: "window-editor", headerId: "header-editor" },
+        { winId: "window-preview", headerId: "header-preview" }
+    ];
+
+    draggableWindows.forEach(({ winId, headerId }) => {
+        const win = document.getElementById(winId);
+        const header = document.getElementById(headerId);
+        if (win && header) {
+            let isWinDragging = false;
+            let winDragStartX = 0;
+            let winDragStartY = 0;
+
+            const onDragStart = (clientX, clientY) => {
+                if (win.classList.contains("maximized")) return;
+                isWinDragging = true;
+                focusWindow(win);
+                const rect = win.getBoundingClientRect();
+                winDragStartX = clientX - rect.left;
+                winDragStartY = clientY - rect.top;
+                win.classList.add("dragging");
+            };
+
+            header.addEventListener("mousedown", (e) => {
+                if (e.target.closest(".window-controls") || e.target.closest(".window-actions") || e.target.closest(".editor-actions")) {
+                    return;
+                }
+                onDragStart(e.clientX, e.clientY);
+
+                const onMouseMove = (moveEvent) => {
+                    if (!isWinDragging) return;
+                    let newLeft = moveEvent.clientX - winDragStartX;
+                    let newTop = moveEvent.clientY - winDragStartY;
+
+                    // Bound checks inside viewport
+                    if (newLeft < 0) newLeft = 0;
+                    if (newTop < 28) newTop = 28; // avoid status bar
+                    if (newLeft + win.offsetWidth > window.innerWidth) newLeft = window.innerWidth - win.offsetWidth;
+                    if (newTop + win.offsetHeight > window.innerHeight - 68) newTop = window.innerHeight - 68 - win.offsetHeight;
+
+                    win.style.left = `${newLeft}px`;
+                    win.style.top = `${newTop}px`;
+                    win.style.right = "auto";
+                };
+
+                const onMouseUp = () => {
+                    isWinDragging = false;
+                    win.classList.remove("dragging");
+                    document.removeEventListener("mousemove", onMouseMove);
+                    document.removeEventListener("mouseup", onMouseUp);
+                };
+
+                document.addEventListener("mousemove", onMouseMove);
+                document.addEventListener("mouseup", onMouseUp);
+            });
+
+            header.addEventListener("touchstart", (e) => {
+                if (e.target.closest(".window-controls") || e.target.closest(".window-actions") || e.target.closest(".editor-actions")) {
+                    return;
+                }
+                onDragStart(e.touches[0].clientX, e.touches[0].clientY);
+
+                const onTouchMove = (moveEvent) => {
+                    if (!isWinDragging) return;
+                    let newLeft = moveEvent.touches[0].clientX - winDragStartX;
+                    let newTop = moveEvent.touches[0].clientY - winDragStartY;
+
+                    if (newLeft < 0) newLeft = 0;
+                    if (newTop < 28) newTop = 28;
+                    if (newLeft + win.offsetWidth > window.innerWidth) newLeft = window.innerWidth - win.offsetWidth;
+                    if (newTop + win.offsetHeight > window.innerHeight - 68) newTop = window.innerHeight - 68 - win.offsetHeight;
+
+                    win.style.left = `${newLeft}px`;
+                    win.style.top = `${newTop}px`;
+                    win.style.right = "auto";
+                };
+
+                const onTouchEnd = () => {
+                    isWinDragging = false;
+                    win.classList.remove("dragging");
+                    document.removeEventListener("touchmove", onTouchMove);
+                    document.removeEventListener("touchend", onTouchEnd);
+                };
+
+                document.addEventListener("touchmove", onTouchMove, { passive: false });
+                document.addEventListener("touchend", onTouchEnd);
+            }, { passive: true });
+        }
+    });
+
+    // Top Status Bar clock updating utility
+    function updateLinuxClock() {
+        const clockEl = document.getElementById("linux-clock");
+        if (!clockEl) return;
+        
+        const days = ["Minggu", "Senin", "Selasa", "Rabu", "Kamis", "Jumat", "Sabtu"];
+        const months = ["Jan", "Feb", "Mar", "Apr", "Mei", "Jun", "Jul", "Agu", "Sep", "Okt", "Nov", "Des"];
+        
+        const now = new Date();
+        const dayName = days[now.getDay()];
+        const date = now.getDate();
+        const monthName = months[now.getMonth()];
+        const hours = String(now.getHours()).padStart(2, '0');
+        const minutes = String(now.getMinutes()).padStart(2, '0');
+        
+        clockEl.textContent = `${dayName}, ${date} ${monthName}, ${hours}:${minutes}`;
+    }
+    setInterval(updateLinuxClock, 1000);
+    updateLinuxClock();
+
     // Startup Session & Database Initialization
     initWorkspaceEditor();
     initVoiceCoding();
@@ -4449,6 +4680,10 @@ user.displayUserInfo();`;
     initUserDatabase();
     initGeminiStudio();
     checkSession();
+    
+    // Initial Focus
+    const aiWin = document.getElementById("floating-ai-container");
+    if (aiWin) focusWindow(aiWin);
 });
 
 // Extra css keyframe for toast-out injected dynamically
