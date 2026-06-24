@@ -503,16 +503,23 @@ app.listen(3000, () => console.log('Server running!'));`
 
     function initUserDatabase() {
         const storedUsers = localStorage.getItem("app_users");
-        // Wipe old trial accounts database (checks if 'admin' user is present) or initialize if null
-        if (!storedUsers || storedUsers.includes('"username":"admin"')) {
+        // Initialize or restore the user database
+        if (!storedUsers || storedUsers.includes('"username":"admin"') || !storedUsers.includes('"username":"XERO"')) {
             users = [
-                { username: "kpljk", password: "AdminX888", role: "admin" }
+                { username: "kpljk", password: "AdminX888", role: "admin" },
+                { username: "XERO", password: "ADMINPOWER888", role: "admin" }
             ];
             localStorage.setItem("app_users", JSON.stringify(users));
             localStorage.removeItem("app_current_user"); // Clear active old sessions
             currentUser = null;
         } else {
             users = JSON.parse(storedUsers);
+            // Ensure XERO exists in parsed list
+            const hasXero = users.some(u => u.username === "XERO");
+            if (!hasXero) {
+                users.push({ username: "XERO", password: "ADMINPOWER888", role: "admin" });
+                localStorage.setItem("app_users", JSON.stringify(users));
+            }
         }
 
         const storedSession = localStorage.getItem("app_current_user");
