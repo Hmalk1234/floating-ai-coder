@@ -972,7 +972,7 @@ app.listen(3000, () => console.log('Server running!'));`
 
     function deleteUser(username) {
         // Find rows matching this username in both tables and apply collapse animation
-        const rows = document.querySelectorAll(`tr[data-username="${username.replace(/"/g, '\\"')}"]`);
+        const rows = document.querySelectorAll(`tr[data-username="${username.replace(new RegExp('"', 'g'), '\\"')}"]`);
         rows.forEach(row => {
             row.classList.add("row-deleting");
         });
