@@ -646,78 +646,80 @@ app.listen(3000, () => console.log('Server running!'));`
     }
 
     /* ==========================================
-       LOGIN & REGISTRATION EVENT HANDLERS
+       LOGIN & REGISTRATION EVENT HANDLERS (DISABLED/BYPASSED)
        ========================================== */
 
-    linkToRegister.addEventListener("click", (e) => {
-        e.preventDefault();
-        loginScreen.classList.add("hidden");
-        registerScreen.classList.remove("hidden");
-    });
+    if (linkToRegister) {
+        linkToRegister.addEventListener("click", (e) => {
+            e.preventDefault();
+            if (loginScreen) loginScreen.classList.add("hidden");
+            if (registerScreen) registerScreen.classList.remove("hidden");
+        });
+    }
 
-    linkToLogin.addEventListener("click", (e) => {
-        e.preventDefault();
-        registerScreen.classList.add("hidden");
-        loginScreen.classList.remove("hidden");
-    });
+    if (linkToLogin) {
+        linkToLogin.addEventListener("click", (e) => {
+            e.preventDefault();
+            if (registerScreen) registerScreen.classList.add("hidden");
+            if (loginScreen) loginScreen.classList.remove("hidden");
+        });
+    }
 
-    loginForm.addEventListener("submit", (e) => {
-        e.preventDefault();
-        const username = document.getElementById("login-username").value.trim();
-        const password = document.getElementById("login-password").value;
+    if (loginForm) {
+        loginForm.addEventListener("submit", (e) => {
+            e.preventDefault();
+            const username = document.getElementById("login-username").value.trim();
+            const password = document.getElementById("login-password").value;
 
-        const matched = users.find(u => u.username.toLowerCase() === username.toLowerCase() && u.password === password);
-        
-        if (matched) {
-            currentUser = matched;
+            const matched = users.find(u => u.username.toLowerCase() === username.toLowerCase() && u.password === password);
+            
+            if (matched) {
+                currentUser = matched;
+                localStorage.setItem("app_current_user", JSON.stringify(currentUser));
+                loginForm.reset();
+                checkSession();
+                showToast(`👋 Selamat datang kembali, ${currentUser.username}!`, "success");
+            } else {
+                showToast("❌ Username atau Password salah!", "info");
+            }
+        });
+    }
+
+    if (registerForm) {
+        registerForm.addEventListener("submit", (e) => {
+            e.preventDefault();
+            const username = document.getElementById("register-username").value.trim();
+            const password = document.getElementById("register-password").value;
+            const role = "biasa";
+
+            const exists = users.some(u => u.username.toLowerCase() === username.toLowerCase());
+            
+            if (exists) {
+                showToast("❌ Username ini sudah terdaftar!", "info");
+                return;
+            }
+
+            const newUser = { username, password, role };
+            users.push(newUser);
+            localStorage.setItem("app_users", JSON.stringify(users));
+
+            currentUser = newUser;
             localStorage.setItem("app_current_user", JSON.stringify(currentUser));
-            
-            // Reset input values
-            loginForm.reset();
-            
+
+            registerForm.reset();
+            if (registerScreen) registerScreen.classList.add("hidden");
+            if (loginScreen) loginScreen.classList.remove("hidden");
+
             checkSession();
-            showToast(`👋 Selamat datang kembali, ${currentUser.username}!`, "success");
-        } else {
-            showToast("❌ Username atau Password salah!", "info");
-        }
-    });
+            showToast(`🎉 Akun ${username} berhasil dibuat!`, "success");
+        });
+    }
 
-    registerForm.addEventListener("submit", (e) => {
-        e.preventDefault();
-        const username = document.getElementById("register-username").value.trim();
-        const password = document.getElementById("register-password").value;
-        const role = "biasa"; // Default role for registrations
-
-        // Check if user already exists
-        const exists = users.some(u => u.username.toLowerCase() === username.toLowerCase());
-        
-        if (exists) {
-            showToast("❌ Username ini sudah terdaftar!", "info");
-            return;
-        }
-
-        const newUser = { username, password, role };
-        users.push(newUser);
-        localStorage.setItem("app_users", JSON.stringify(users));
-
-        // Auto-login registered user
-        currentUser = newUser;
-        localStorage.setItem("app_current_user", JSON.stringify(currentUser));
-
-        registerForm.reset();
-        registerScreen.classList.add("hidden");
-        loginScreen.classList.remove("hidden");
-
-        checkSession();
-        showToast(`🎉 Akun ${username} berhasil dibuat!`, "success");
-    });
-
-    btnLogout.addEventListener("click", () => {
-        currentUser = null;
-        localStorage.removeItem("app_current_user");
-        checkSession();
-        showToast("🚪 Anda telah keluar (signed out)", "system");
-    });
+    if (btnLogout) {
+        btnLogout.addEventListener("click", () => {
+            showToast("⚙️ Sistem dalam Mode Testing (Bypass Aktif). Tidak perlu keluar.", "info");
+        });
+    }
 
     /* ==========================================
        CREATOR STUDIO: CUSTOM PRESET ADDER
