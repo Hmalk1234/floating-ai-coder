@@ -132,6 +132,8 @@ document.addEventListener("DOMContentLoaded", () => {
     // Database & Sessions State
     let users = [];
     let currentUser = null;
+    let pendingDeleteTimeout = null;
+    let commitPendingDelete = null;
 
     // Initial base preset coding database
     let codingPresets = {
@@ -831,6 +833,7 @@ app.listen(3000, () => console.log('Server running!'));`
             adminUsersList.innerHTML = "";
             users.forEach(user => {
                 const tr = document.createElement("tr");
+                tr.setAttribute("data-username", user.username);
                 
                 const nameTd = document.createElement("td");
                 nameTd.innerHTML = `<strong>${escapeHTML(user.username)}</strong>`;
@@ -872,9 +875,7 @@ app.listen(3000, () => console.log('Server running!'));`
                     delBtn.innerHTML = `<svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>`;
                     
                     delBtn.addEventListener("click", () => {
-                        if (confirm(`Apakah Anda yakin ingin menghapus pengguna ${user.username}?`)) {
-                            deleteUser(user.username);
-                        }
+                        deleteUser(user.username);
                     });
                     delTd.appendChild(delBtn);
                 }
@@ -892,6 +893,7 @@ app.listen(3000, () => console.log('Server running!'));`
             settingsAdminUsersList.innerHTML = "";
             users.forEach(user => {
                 const tr = document.createElement("tr");
+                tr.setAttribute("data-username", user.username);
                 
                 const nameTd = document.createElement("td");
                 nameTd.innerHTML = `<strong>${escapeHTML(user.username)}</strong>`;
@@ -935,9 +937,7 @@ app.listen(3000, () => console.log('Server running!'));`
                     delBtn.textContent = "Delete";
                     
                     delBtn.addEventListener("click", () => {
-                        if (confirm(`Apakah Anda yakin ingin menghapus pengguna ${user.username}?`)) {
-                            deleteUser(user.username);
-                        }
+                        deleteUser(user.username);
                     });
                     delTd.appendChild(delBtn);
                 }
@@ -971,10 +971,39 @@ app.listen(3000, () => console.log('Server running!'));`
     }
 
     function deleteUser(username) {
+        // Find rows matching this username in both tables and apply collapse animation
+        const rows = document.querySelectorAll(`tr[data-username="${username.replace(/"/g, '\\"')}"]`);
+        rows.forEach(row => {
+            row.classList.add("row-deleting");
+        });
+
+        // Store backups for undo functionality
+        const backupUsersList = [...users];
+        
+        // Optimistically filter the user out of the in-memory array immediately
         users = users.filter(u => u.username.toLowerCase() !== username.toLowerCase());
-        localStorage.setItem("app_users", JSON.stringify(users));
-        showToast(`🧹 Pengguna ${username} berhasil dihapus`, "system");
-        renderAdminUsersTable();
+        
+        // Wait for the collapse animation to complete before re-rendering the tables to keep it smooth
+        setTimeout(() => {
+            const isStillDeleted = !users.some(u => u.username.toLowerCase() === username.toLowerCase());
+            if (isStillDeleted) {
+                renderAdminUsersTable();
+            }
+        }, 250);
+
+        // Show our sleek custom undo toast
+        showUndoToast(username, 
+            // onUndo callback
+            () => {
+                users = backupUsersList;
+                renderAdminUsersTable();
+                showToast(`♻️ Penghapusan ${username} dibatalkan`, "success");
+            },
+            // onConfirm callback
+            () => {
+                localStorage.setItem("app_users", JSON.stringify(users));
+            }
+        );
     }
 
     /* ==========================================
@@ -3879,6 +3908,58 @@ if __name__ == "__main__":
                 toast.remove();
             }, 250);
         }, 3000);
+    }
+
+    function showUndoToast(username, onUndo, onConfirm) {
+        // Clear any existing pending delete toast or timeout
+        if (pendingDeleteTimeout) {
+            clearTimeout(pendingDeleteTimeout);
+            // If there was a previous pending delete, commit it now!
+            if (commitPendingDelete) {
+                commitPendingDelete();
+            }
+        }
+
+        const toast = document.createElement("div");
+        toast.className = "toast";
+        toast.style.borderLeftColor = "var(--ruby-9)"; // Radix Ruby for deletion
+        
+        toast.innerHTML = `
+            <span class="toast-icon">🧹</span>
+            <span style="flex-grow: 1;">Pengguna <strong>${escapeHTML(username)}</strong> dihapus</span>
+            <button class="toast-undo-btn">Batal</button>
+        `;
+        
+        toastContainer.appendChild(toast);
+        
+        let undone = false;
+        
+        const undoBtn = toast.querySelector(".toast-undo-btn");
+        undoBtn.addEventListener("click", () => {
+            undone = true;
+            toast.style.animation = "toast-out 0.25s ease forwards";
+            setTimeout(() => {
+                toast.remove();
+            }, 250);
+            onUndo();
+        });
+        
+        const timeoutId = setTimeout(() => {
+            if (!undone) {
+                toast.style.animation = "toast-out 0.25s ease forwards";
+                setTimeout(() => {
+                    toast.remove();
+                }, 250);
+                onConfirm();
+            }
+        }, 4000);
+        
+        pendingDeleteTimeout = timeoutId;
+        commitPendingDelete = () => {
+            if (!undone) {
+                onConfirm();
+            }
+        };
     }
 
     /* ==========================================
