@@ -522,6 +522,11 @@ app.listen(3000, () => console.log('Server running!'));`
     }
 
     function checkSession() {
+        const explorerWin = document.getElementById("window-explorer");
+        const editorWin = document.getElementById("window-editor");
+        const previewWin = document.getElementById("window-preview");
+        const appDock = document.querySelector(".application-dock");
+
         if (!currentUser) {
             // Not Logged In State: Hide elements, show login screen
             tabsBar.classList.add("hidden");
@@ -536,6 +541,12 @@ app.listen(3000, () => console.log('Server running!'));`
             headerUserProfile.classList.add("hidden");
             headerStatus.classList.remove("hidden");
             panelMainTitle.textContent = "Antigravity AI (Sign In)";
+
+            // Hide other desktop windows and dock until logged in
+            if (explorerWin) explorerWin.classList.add("hidden");
+            if (editorWin) editorWin.classList.add("hidden");
+            if (previewWin) previewWin.classList.add("hidden");
+            if (appDock) appDock.classList.add("hidden");
         } else {
             // Logged In State: Show navigation, show active view
             authContainer.classList.add("hidden");
@@ -555,6 +566,21 @@ app.listen(3000, () => console.log('Server running!'));`
             const aTab = tabsBar.querySelector(".admin-tab");
             cTab.classList.remove("hidden");
             aTab.classList.remove("hidden");
+
+            // Restore desktop windows and dock upon login
+            if (explorerWin) {
+                explorerWin.classList.remove("hidden");
+                explorerWin.classList.remove("minimized");
+            }
+            if (editorWin) {
+                editorWin.classList.remove("hidden");
+                editorWin.classList.remove("minimized");
+            }
+            if (previewWin) {
+                previewWin.classList.remove("hidden");
+                previewWin.classList.remove("minimized");
+            }
+            if (appDock) appDock.classList.remove("hidden");
 
             switchCategory(currentCategory);
         }
