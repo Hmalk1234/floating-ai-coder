@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Floating AI Coder - Premium AI Assistant</title>
-    <link rel="stylesheet" href="style.css?v=1.0.1">
+    <link rel="stylesheet" href="style.css?v=1.0.3">
     <!-- Google Fonts: Plus Jakarta Sans for UI, JetBrains Mono for Code -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -106,6 +106,13 @@
                     </div>
                     <span class="window-title">👁️ Live Browser & Flowchart</span>
                 </div>
+                <!-- Premium Linux Browser Address Bar -->
+                <div class="browser-address-bar">
+                    <button class="browser-nav-btn" title="Back">◀</button>
+                    <button class="browser-nav-btn" title="Forward">▶</button>
+                    <button class="browser-nav-btn" title="Refresh">🔄</button>
+                    <input type="text" class="browser-url-input" value="http://localhost:8000/" readonly>
+                </div>
                 <div class="preview-body" id="workspace-preview-body">
                     <iframe id="live-preview-iframe" class="preview-frame" sandbox="allow-scripts"></iframe>
                     <div id="live-preview-console" class="preview-console hidden">
@@ -113,6 +120,162 @@
                         <pre class="console-log" id="console-log-output"></pre>
                     </div>
                     <div id="live-preview-flowchart" class="preview-flowchart hidden"></div>
+                </div>
+            </section>
+
+            <!-- Linux Jendela: System Control Center & Settings (Aplikasi Pengaturan) -->
+            <section class="workspace-settings-panel linux-window hidden" id="window-settings">
+                <div class="settings-header window-header" id="header-settings">
+                    <div class="window-controls">
+                        <button class="win-btn win-close" title="Close" onclick="toggleWindow('window-settings')">🔴</button>
+                        <button class="win-btn win-min" title="Minimize" onclick="toggleWindow('window-settings')">🟡</button>
+                        <button class="win-btn win-max" title="Maximize" onclick="maximizeWindow('window-settings')">🟢</button>
+                    </div>
+                    <span class="window-title">⚙️ Control Center & Settings</span>
+                </div>
+                <div class="settings-body-wrapper">
+                    <!-- Sidebar for settings categories -->
+                    <aside class="settings-sidebar-nav">
+                        <button class="settings-nav-btn active" data-settings-tab="profile">👤 Profile</button>
+                        <button class="settings-nav-btn" data-settings-tab="themes">🎨 Themes</button>
+                        <button class="settings-nav-btn creator-only-nav hidden" data-settings-tab="creator">🎨 Creator</button>
+                        <button class="settings-nav-btn admin-only-nav hidden" data-settings-tab="admin">🛠️ Admin</button>
+                    </aside>
+                    <!-- Settings Content Area -->
+                    <div class="settings-content-area">
+                        <!-- Tab 1: Profile & Account -->
+                        <div class="settings-tab-view" id="settings-tab-profile">
+                            <h3>👤 User Account Profile</h3>
+                            <p class="settings-tab-subtitle">Informasi profil akun aktif Anda dalam sistem Antigravity OS.</p>
+                            <div class="profile-card">
+                                <div class="profile-avatar-large">👤</div>
+                                <div class="profile-info">
+                                    <p class="profile-field">Username: <strong id="profile-username">Guest</strong></p>
+                                    <p class="profile-field">Access Role: <span id="profile-role-badge" class="user-role-badge biasa">Biasa</span></p>
+                                </div>
+                            </div>
+                            <div class="profile-actions">
+                                <button id="btn-settings-logout" class="btn-settings-action">Logout from System</button>
+                            </div>
+                        </div>
+                        
+                        <!-- Tab 2: Desktop Themes -->
+                        <div class="settings-tab-view hidden" id="settings-tab-themes">
+                            <h3>🎨 Desktop Themes</h3>
+                            <p class="settings-tab-subtitle">Pilih skema warna tema premium untuk desktop virtual Linux Anda.</p>
+                            <div class="theme-selector-grid">
+                                <button class="theme-select-card active" data-theme="violet">
+                                    <span class="theme-preview-color violet"></span>
+                                    <span>Violet Neon</span>
+                                </button>
+                                <button class="theme-select-card" data-theme="cyan">
+                                    <span class="theme-preview-color cyan"></span>
+                                    <span>Cyberpunk Cyan</span>
+                                </button>
+                                <button class="theme-select-card" data-theme="emerald">
+                                    <span class="theme-preview-color emerald"></span>
+                                    <span>Emerald Glow</span>
+                                </button>
+                                <button class="theme-select-card" data-theme="arch">
+                                    <span class="theme-preview-color arch"></span>
+                                    <span>Arch Slate</span>
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Tab 3: Creator Space -->
+                        <div class="settings-tab-view hidden" id="settings-tab-creator">
+                            <h3>🎨 Creator Space & Presets</h3>
+                            <p class="settings-tab-subtitle">Tambahkan preset coding baru ke AI Assistant. Memerlukan License Key valid dari Admin.</p>
+                            <form id="settings-creator-form" class="settings-form">
+                                <div class="form-group">
+                                    <label for="creator-key-input">License Key (Creator Key)</label>
+                                    <input type="text" id="creator-key-input" placeholder="CREATOR-XXXX-XXXX-XXXX" required>
+                                </div>
+                                <div class="form-row">
+                                    <div class="form-group">
+                                        <label for="creator-preset-category">Kategori</label>
+                                        <select id="creator-preset-category" class="settings-select" required>
+                                            <option value="roblox">Roblox</option>
+                                            <option value="web">Web</option>
+                                            <option value="game">Game (Unity/Godot)</option>
+                                            <option value="app">App (Python/JS)</option>
+                                        </select>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="creator-preset-lang">Bahasa Pemrograman</label>
+                                        <input type="text" id="creator-preset-lang" placeholder="lua, css, javascript, python" required>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label for="creator-preset-title">Judul Preset (Nama Tombol)</label>
+                                    <input type="text" id="creator-preset-title" placeholder="Contoh: Script Data Saving, Flexbox Card..." required>
+                                </div>
+                                <div class="form-group">
+                                    <label for="creator-preset-desc">Deskripsi Singkat</label>
+                                    <input type="text" id="creator-preset-desc" placeholder="Jelaskan apa yang dilakukan oleh kode ini..." required>
+                                </div>
+                                <div class="form-group">
+                                    <label for="creator-preset-code">Source Code</label>
+                                    <textarea id="creator-preset-code" rows="4" placeholder="Tulis atau paste kode program lengkap di sini..." required></textarea>
+                                </div>
+                                <button type="submit" class="btn-settings-submit">Publish Preset (Verify Key)</button>
+                            </form>
+                        </div>
+
+                        <!-- Tab 4: Admin Control Center -->
+                        <div class="settings-tab-view hidden" id="settings-tab-admin">
+                            <h3>🛠️ Admin Server Control</h3>
+                            <p class="settings-tab-subtitle">Panel kendali tingkat tinggi untuk mengatur sistem, lisensi, dan terminal server.</p>
+                            
+                            <!-- Sub-tab 1: User Management -->
+                            <div class="admin-section">
+                                <h4>👤 User Accounts Management</h4>
+                                <div class="admin-table-container">
+                                    <table class="user-mgmt-table">
+                                        <thead>
+                                            <tr>
+                                                <th>Username</th>
+                                                <th>Role</th>
+                                                <th>Change Role</th>
+                                                <th>Action</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="settings-admin-users-list">
+                                            <!-- Managed dynamically -->
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                            
+                            <!-- Sub-tab 2: Creator Key Generator -->
+                            <div class="admin-section" style="margin-top: 15px;">
+                                <h4>🔑 Creator License Key Generator</h4>
+                                <div class="key-gen-wrapper">
+                                    <button type="button" id="btn-generate-creator-key" class="btn-admin-action">Generate Key</button>
+                                    <input type="text" id="generated-key-display" readonly placeholder="Klik Generate Key...">
+                                </div>
+                                <p style="font-size: 0.72rem; color: var(--text-muted); margin-top: 5px;">Kunci ini dapat diberikan kepada Kreator untuk mempublikasikan preset baru.</p>
+                            </div>
+
+                            <!-- Sub-tab 3: Server Console Terminal -->
+                            <div class="admin-section" style="margin-top: 15px;">
+                                <h4>💻 Server Console Terminal (Direct Control)</h4>
+                                <div class="server-terminal">
+                                    <div class="terminal-output" id="server-terminal-logs">
+Antigravity OS v2.5.0 Server Control Console
+Status: ONLINE | Port: 8000
+Services: WebServer (Port 8000), AI Model Engine (Gemini 2.5 Pro)
+Type 'help' for a list of available commands.
+                                    </div>
+                                    <div class="terminal-input-line">
+                                        <span class="terminal-prompt">admin@antigravity:~$</span>
+                                        <input type="text" id="server-terminal-input" placeholder="Ketik perintah server (e.g. status, logs, restart, deploy)...">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </section>
         </main>
@@ -222,7 +385,7 @@
 
         <!-- Main Panel Content Area -->
         <div class="panel-main-content" id="panel-main-content">
-            <!-- Category Tabs (Always visible, admin/creator shown by default) -->
+            <!-- Category Tabs (Biasa/Tanya/BugHunter only now) -->
             <nav class="category-tabs" id="category-tabs-bar">
                 <button class="tab-btn active" data-category="roblox">
                     <span class="tab-icon">⚡</span> Roblox
@@ -242,18 +405,53 @@
                 <button class="tab-btn" data-category="bughunter">
                     <span class="tab-icon">🪲</span> Bug Hunter
                 </button>
-                <button class="tab-btn creator-tab" data-category="creator">
-                    <span class="tab-icon">🎨</span> Creator
-                </button>
-                <button class="tab-btn admin-tab" data-category="admin">
-                    <span class="tab-icon">🛠️</span> Admin
-                </button>
             </nav>
 
         <!-- Panel Body: Contains Forms, Chat Log, Studio & Admin dashboard views -->
         <div id="chat-body" class="panel-body">
             
-
+            <!-- A. LOGIN / REGISTER SCREEN (SHOWS WHEN USER IS NOT LOGGED IN) -->
+            <div id="auth-container" class="auth-box">
+                <!-- A1. LOGIN SCREEN -->
+                <div id="login-screen" class="auth-screen">
+                    <h3 class="auth-title">Sign In</h3>
+                    <p class="auth-subtitle">Masuk ke Antigravity AI Coder</p>
+                    <form id="login-form" class="auth-form">
+                        <div class="form-group">
+                            <label for="login-username">Username</label>
+                            <input type="text" id="login-username" placeholder="Masukkan username..." required>
+                        </div>
+                        <div class="form-group">
+                            <label for="login-password">Password</label>
+                            <input type="password" id="login-password" placeholder="Masukkan password..." required>
+                        </div>
+                        <button type="submit" class="btn-auth-submit">Sign In</button>
+                    </form>
+                    <div class="auth-switch-text">
+                        Belum punya akun? <a href="#" id="link-to-register">Daftar sekarang</a>
+                    </div>
+                </div>
+                
+                <!-- A2. REGISTRATION SCREEN -->
+                <div id="register-screen" class="auth-screen hidden">
+                    <h3 class="auth-title">Daftar Akun</h3>
+                    <p class="auth-subtitle">Buat akun baru Anda</p>
+                    <form id="register-form" class="auth-form">
+                        <div class="form-group">
+                            <label for="register-username">Username</label>
+                            <input type="text" id="register-username" placeholder="Buat username..." required>
+                        </div>
+                        <div class="form-group">
+                            <label for="register-password">Password</label>
+                            <input type="password" id="register-password" placeholder="Buat password..." required>
+                        </div>
+                        <button type="submit" class="btn-auth-submit">Register</button>
+                    </form>
+                    <div class="auth-switch-text">
+                        Sudah punya akun? <a href="#" id="link-to-login">Masuk sekarang</a>
+                    </div>
+                </div>
+            </div>
 
             <!-- B. MAIN CHAT LOG VIEW (ONLY VISIBLE ONCE LOGGED IN & ACTIVE CHAT CATEGORY) -->
             <div id="chat-content-view" class="tab-view">
@@ -478,6 +676,6 @@
     <!-- Notification Toast System -->
     <div id="toast-container" class="toast-container"></div>
 
-    <script src="app.js?v=1.0.1"></script>
+    <script src="app.js?v=1.0.3"></script>
 </body>
 </html>

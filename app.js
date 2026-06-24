@@ -503,32 +503,56 @@ app.listen(3000, () => console.log('Server running!'));`
 
     function initUserDatabase() {
         const storedUsers = localStorage.getItem("app_users");
-        // Initialize or restore the user database
-        if (!storedUsers || storedUsers.includes('"username":"admin"') || !storedUsers.includes('"username":"XERO"')) {
+        // Initialize the comprehensive database of default roles
+        if (!storedUsers || storedUsers.includes('"username":"admin"')) {
             users = [
                 { username: "kpljk", password: "AdminX888", role: "admin" },
-                { username: "XERO", password: "ADMINPOWER888", role: "admin" }
+                { username: "XERO", password: "ADMINPOWER888", role: "admin" },
+                { username: "CREATOR", password: "CREATORPOWER888", role: "creator" },
+                { username: "USER", password: "USERPOWER888", role: "biasa" }
             ];
             localStorage.setItem("app_users", JSON.stringify(users));
+            localStorage.removeItem("app_current_user"); // Clear old sessions
+            currentUser = null;
         } else {
             users = JSON.parse(storedUsers);
-            const hasXero = users.some(u => u.username === "XERO");
-            if (!hasXero) {
-                users.push({ username: "XERO", password: "ADMINPOWER888", role: "admin" });
+            // Ensure default accounts are present
+            const defaults = [
+                { username: "kpljk", password: "AdminX888", role: "admin" },
+                { username: "XERO", password: "ADMINPOWER888", role: "admin" },
+                { username: "CREATOR", password: "CREATORPOWER888", role: "creator" },
+                { username: "USER", password: "USERPOWER888", role: "biasa" }
+            ];
+            let updated = false;
+            defaults.forEach(def => {
+                if (!users.some(u => u.username === def.username)) {
+                    users.push(def);
+                    updated = true;
+                }
+            });
+            if (updated) {
                 localStorage.setItem("app_users", JSON.stringify(users));
             }
         }
 
-        // FORCE LOGIN BYPASS: Automatically log in as XERO (admin) for testing
-        currentUser = { username: "XERO", password: "ADMINPOWER888", role: "admin" };
-        localStorage.setItem("app_current_user", JSON.stringify(currentUser));
+        const storedSession = localStorage.getItem("app_current_user");
+        if (storedSession) {
+            currentUser = JSON.parse(storedSession);
+        }
     }
 
     function checkSession() {
         const explorerWin = document.getElementById("window-explorer");
         const editorWin = document.getElementById("window-editor");
         const previewWin = document.getElementById("window-preview");
+        const settingsWin = document.getElementById("window-settings");
         const appDock = document.querySelector(".application-dock");
+
+        // Profile sub-nodes
+        const profileUsername = document.getElementById("profile-username");
+        const profileRoleBadge = document.getElementById("profile-role-badge");
+        const creatorNavBtn = document.querySelector(".creator-only-nav");
+        const adminNavBtn = document.querySelector(".admin-only-nav");
 
         if (!currentUser) {
             // Not Logged In State: Hide elements, show login screen
@@ -545,13 +569,14 @@ app.listen(3000, () => console.log('Server running!'));`
             headerStatus.classList.remove("hidden");
             panelMainTitle.textContent = "Antigravity AI (Sign In)";
 
-            // Hide other desktop windows and dock until logged in
+            // Hide all other desktop windows and dock until logged in
             if (explorerWin) explorerWin.classList.add("hidden");
             if (editorWin) editorWin.classList.add("hidden");
             if (previewWin) previewWin.classList.add("hidden");
+            if (settingsWin) settingsWin.classList.add("hidden");
             if (appDock) appDock.classList.add("hidden");
 
-            // Secure Gemini Studio: Hide toggle button and force-collapse sidebar
+            // Secure Gemini Studio settings
             if (btnToggleSidebar) btnToggleSidebar.classList.add("hidden");
             if (studioSidebar) studioSidebar.classList.add("hidden");
             if (container) {
@@ -564,6 +589,7 @@ app.listen(3000, () => console.log('Server running!'));`
             headerUserProfile.classList.remove("hidden");
             headerStatus.classList.add("hidden");
             tabsBar.classList.remove("hidden");
+            panelFooter.classList.remove("hidden");
             
             panelMainTitle.textContent = "Antigravity AI Coder";
             headerUserName.textContent = currentUser.username;
@@ -571,12 +597,6 @@ app.listen(3000, () => console.log('Server running!'));`
             // Format role tag badge
             headerUserRole.className = `user-role-tag ${currentUser.role}`;
             headerUserRole.textContent = currentUser.role === "biasa" ? "Biasa" : currentUser.role;
-
-            // Render Role-specific tabs (always show them to allow easy exploration)
-            const cTab = tabsBar.querySelector(".creator-tab");
-            const aTab = tabsBar.querySelector(".admin-tab");
-            cTab.classList.remove("hidden");
-            aTab.classList.remove("hidden");
 
             // Restore desktop windows and dock upon login
             if (explorerWin) {
@@ -593,8 +613,47 @@ app.listen(3000, () => console.log('Server running!'));`
             }
             if (appDock) appDock.classList.remove("hidden");
 
-            // Reveal Gemini Studio settings toggle upon login
+            // Reveal Gemini Studio settings toggle
             if (btnToggleSidebar) btnToggleSidebar.classList.remove("hidden");
+
+            // Configure settings Control Center profile view
+            if (profileUsername) profileUsername.textContent = currentUser.username;
+            if (profileRoleBadge) {
+                profileRoleBadge.className = `user-role-badge ${currentUser.role}`;
+                profileRoleBadge.textContent = currentUser.role === "biasa" ? "Biasa" : currentUser.role;
+            }
+
+            // Configure settings sidebar navigations based on active role
+            if (creatorNavBtn) {
+                if (currentUser.role === "creator" || currentUser.role === "admin") {
+                    creatorNavBtn.classList.remove("hidden");
+                } else {
+                    creatorNavBtn.classList.add("hidden");
+                }
+            }
+            if (adminNavBtn) {
+                if (currentUser.role === "admin") {
+                    adminNavBtn.classList.remove("hidden");
+                } else {
+                    adminNavBtn.classList.add("hidden");
+                }
+            }
+
+            // If they are locked out of their active tab, revert to profile tab
+            const activeNavTab = document.querySelector(".settings-nav-btn.active");
+            if (activeNavTab) {
+                const tabName = activeNavTab.getAttribute("data-settings-tab");
+                if (tabName === "creator" && currentUser.role === "biasa") {
+                    switchSettingsTab("profile");
+                } else if (tabName === "admin" && currentUser.role !== "admin") {
+                    switchSettingsTab("profile");
+                }
+            }
+
+            // Render admin tables if admin
+            if (currentUser.role === "admin") {
+                renderAdminUsersTable();
+            }
 
             switchCategory(currentCategory);
         }
@@ -847,27 +906,29 @@ app.listen(3000, () => console.log('Server running!'));`
        THEME / GLOW SWITCHER
        ========================================== */
 
-    btnGlobalTheme.addEventListener("click", () => {
-        if (activeTheme === "violet") {
-            activeTheme = "cyan";
-            container.className = "floating-panel active-theme-cyan";
-            triggerBubble.className = "minimized-bubble hidden active-theme-cyan";
-            showToast("🎨 Tema diubah ke Cyan Mode", "theme");
-        } else if (activeTheme === "cyan") {
-            activeTheme = "emerald";
-            container.className = "floating-panel active-theme-emerald";
-            triggerBubble.className = "minimized-bubble hidden active-theme-emerald";
-            showToast("🎨 Tema diubah ke Emerald Mode", "theme");
-        } else {
-            activeTheme = "violet";
-            container.className = "floating-panel active-theme-violet";
-            triggerBubble.className = "minimized-bubble hidden active-theme-violet";
-            showToast("🎨 Tema diubah ke Violet Mode", "theme");
-        }
-        
-        document.querySelector(".orb-1").style.background = `radial-gradient(circle, var(--theme-primary) 0%, transparent 70%)`;
-        document.querySelector(".orb-2").style.background = `radial-gradient(circle, var(--theme-secondary) 0%, transparent 70%)`;
-    });
+    if (btnGlobalTheme) {
+        btnGlobalTheme.addEventListener("click", () => {
+            if (activeTheme === "violet") {
+                activeTheme = "cyan";
+                container.className = "floating-panel active-theme-cyan";
+                triggerBubble.className = "minimized-bubble hidden active-theme-cyan";
+                showToast("🎨 Tema diubah ke Cyan Mode", "theme");
+            } else if (activeTheme === "cyan") {
+                activeTheme = "emerald";
+                container.className = "floating-panel active-theme-emerald";
+                triggerBubble.className = "minimized-bubble hidden active-theme-emerald";
+                showToast("🎨 Tema diubah ke Emerald Mode", "theme");
+            } else {
+                activeTheme = "violet";
+                container.className = "floating-panel active-theme-violet";
+                triggerBubble.className = "minimized-bubble hidden active-theme-violet";
+                showToast("🎨 Tema diubah ke Violet Mode", "theme");
+            }
+            
+            document.querySelector(".orb-1").style.background = `radial-gradient(circle, var(--theme-primary) 0%, transparent 70%)`;
+            document.querySelector(".orb-2").style.background = `radial-gradient(circle, var(--theme-secondary) 0%, transparent 70%)`;
+        });
+    }
 
     /* ==========================================
        DRAG-AND-DROP & RESIZE MECHANICS
@@ -2322,7 +2383,7 @@ if __name__ == "__main__":
         });
 
         function updateHUD() {
-            hud.textContent = `SCORE: ${score} | BEST: ${highScore}`;
+            hud.textContent = \`SCORE: \${score} | BEST: \${highScore}\`;
         }
         updateHUD();
 
@@ -2358,7 +2419,7 @@ if __name__ == "__main__":
             }
             
             overlayTitle.textContent = "GAME OVER";
-            overlayDesc.textContent = `Skor Anda: ${score} (Terbaik: ${highScore}). Cobalah sekali lagi untuk memecahkan rekor baru!`;
+            overlayDesc.textContent = \`Skor Anda: \${score} (Terbaik: \${highScore}). Cobalah sekali lagi untuk memecahkan rekor baru!\`;
             btnStart.textContent = "MAIN LAGI";
             overlay.classList.remove("hidden");
             
@@ -2662,7 +2723,7 @@ if __name__ == "__main__":
         }
 
         function updateHUD() {
-            hud.textContent = `SCORE: ${score} | BEST: ${highScore}`;
+            hud.textContent = \`SCORE: \${score} | BEST: \${highScore}\`;
         }
         updateHUD();
 
@@ -2716,7 +2777,7 @@ if __name__ == "__main__":
             playBeep(120, 0.4);
             
             title.textContent = "GAME OVER";
-            desc.textContent = `Cyber-Snake mengalami malfungsi. Skor Anda: ${score} (Poin Tertinggi: ${highScore})`;
+            desc.textContent = \`Cyber-Snake mengalami malfungsi. Skor Anda: \${score} (Poin Tertinggi: \${highScore})\`;
             overlay.classList.remove("hidden");
         }
 
@@ -4494,6 +4555,7 @@ user.displayUserInfo();`;
         if (winId === "window-explorer") return "dock-explorer";
         if (winId === "window-editor") return "dock-editor";
         if (winId === "window-preview") return "dock-preview";
+        if (winId === "window-settings") return "dock-settings";
         if (winId === "floating-ai-container") return "dock-ai";
         return null;
     }
@@ -4562,7 +4624,7 @@ user.displayUserInfo();`;
             return;
         }
 
-        // Standard windows (Explorer, Editor, Preview)
+        // Standard windows (Explorer, Editor, Preview, Settings)
         if (win.classList.contains("minimized") || win.classList.contains("hidden") || win.style.display === "none") {
             win.classList.remove("minimized");
             win.classList.remove("hidden");
@@ -4594,7 +4656,7 @@ user.displayUserInfo();`;
     };
 
     // Bind click focus listeners to all window panels
-    const windowIds = ["window-explorer", "window-editor", "window-preview", "floating-ai-container"];
+    const windowIds = ["window-explorer", "window-editor", "window-preview", "window-settings", "floating-ai-container"];
     windowIds.forEach(id => {
         const win = document.getElementById(id);
         if (win) {
@@ -4607,7 +4669,8 @@ user.displayUserInfo();`;
     const draggableWindows = [
         { winId: "window-explorer", headerId: "header-explorer" },
         { winId: "window-editor", headerId: "header-editor" },
-        { winId: "window-preview", headerId: "header-preview" }
+        { winId: "window-preview", headerId: "header-preview" },
+        { winId: "window-settings", headerId: "header-settings" }
     ];
 
     draggableWindows.forEach(({ winId, headerId }) => {
@@ -4715,12 +4778,329 @@ user.displayUserInfo();`;
     setInterval(updateLinuxClock, 1000);
     updateLinuxClock();
 
+    /* ==========================================
+       SYSTEM CONTROL CENTER & SETTINGS LOGIC
+       ========================================== */
+
+    function initControlCenter() {
+        // 1. Dock Settings Icon Link
+        const dockSettings = document.getElementById("dock-settings");
+        if (dockSettings) {
+            dockSettings.addEventListener("click", () => {
+                toggleWindow("window-settings");
+            });
+        }
+
+        // 2. Settings tab switching
+        const settingsNavBtns = document.querySelectorAll(".settings-nav-btn");
+        settingsNavBtns.forEach(btn => {
+            btn.addEventListener("click", () => {
+                const tabName = btn.getAttribute("data-settings-tab");
+                switchSettingsTab(tabName);
+            });
+        });
+
+        // 3. Theme selector cards
+        const themeCards = document.querySelectorAll(".theme-select-card");
+        themeCards.forEach(card => {
+            card.addEventListener("click", () => {
+                const theme = card.getAttribute("data-theme");
+                applyDesktopTheme(theme);
+            });
+        });
+
+        // 4. Creator preset submission
+        const creatorForm = document.getElementById("settings-creator-form");
+        if (creatorForm) {
+            creatorForm.addEventListener("submit", (e) => {
+                e.preventDefault();
+                const key = document.getElementById("creator-key-input").value.trim();
+                const category = document.getElementById("creator-preset-category").value;
+                const lang = document.getElementById("creator-preset-lang").value.trim().toLowerCase();
+                const title = document.getElementById("creator-preset-title").value.trim();
+                const desc = document.getElementById("creator-preset-desc").value.trim();
+                const code = document.getElementById("creator-preset-code").value.trim();
+                
+                // Validate license key
+                let validKeys = [];
+                try {
+                    validKeys = JSON.parse(localStorage.getItem("app_creator_keys")) || [];
+                } catch (err) {
+                    validKeys = [];
+                }
+                
+                const keyIndex = validKeys.indexOf(key);
+                if (keyIndex === -1) {
+                    showToast("❌ License Key tidak valid atau sudah digunakan!", "info");
+                    return;
+                }
+                
+                // Key is valid! Save preset
+                const presetId = `custom_${category}_${Date.now()}`;
+                if (codingPresets[category]) {
+                    codingPresets[category].suggestions.push({ text: title, id: presetId });
+                    codingPresets[category].responses[presetId] = {
+                        title: title,
+                        lang: lang,
+                        text: desc,
+                        code: code
+                    };
+                    
+                    // Persist custom presets in localStorage
+                    let customs = [];
+                    try {
+                        customs = JSON.parse(localStorage.getItem("custom_presets")) || [];
+                    } catch (err) {
+                        customs = [];
+                    }
+                    customs.push({ category, lang, title, desc, code, id: presetId });
+                    localStorage.setItem("custom_presets", JSON.stringify(customs));
+                    
+                    // Consume key (remove from active list)
+                    validKeys.splice(keyIndex, 1);
+                    localStorage.setItem("app_creator_keys", JSON.stringify(validKeys));
+                    
+                    // Update suggestions view if current category matches
+                    if (currentCategory === category) {
+                        updateSuggestions();
+                    }
+                    
+                    showToast("🎉 Preset kustom berhasil dipublikasikan menggunakan License Key!", "success");
+                    creatorForm.reset();
+                    switchSettingsTab("profile");
+                } else {
+                    showToast("❌ Kategori preset tidak dikenal!", "info");
+                }
+            });
+        }
+
+        // 5. Admin key generator
+        const btnGenKey = document.getElementById("btn-generate-creator-key");
+        const keyDisplay = document.getElementById("generated-key-display");
+        if (btnGenKey && keyDisplay) {
+            btnGenKey.addEventListener("click", () => {
+                // Generate a key like CREATOR-XXXX-XXXX-XXXX
+                const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+                const genPart = () => {
+                    let part = "";
+                    for (let idx = 0; idx < 4; idx++) {
+                        part += chars.charAt(Math.floor(Math.random() * chars.length));
+                    }
+                    return part;
+                };
+                const key = `CREATOR-${genPart()}-${genPart()}-${genPart()}`;
+                
+                // Save to valid keys list
+                let validKeys = [];
+                try {
+                    validKeys = JSON.parse(localStorage.getItem("app_creator_keys")) || [];
+                } catch (err) {
+                    validKeys = [];
+                }
+                validKeys.push(key);
+                localStorage.setItem("app_creator_keys", JSON.stringify(validKeys));
+                
+                // Display key
+                keyDisplay.value = key;
+                showToast("🔑 Creator License Key baru berhasil di-generate!", "success");
+            });
+        }
+
+        // 6. Admin server terminal console
+        const termInput = document.getElementById("server-terminal-input");
+        const termLogs = document.getElementById("server-terminal-logs");
+        if (termInput && termLogs) {
+            termInput.addEventListener("keydown", (e) => {
+                if (e.key === "Enter") {
+                    const cmd = termInput.value.trim();
+                    if (!cmd) return;
+                    
+                    // Append command to output
+                    termLogs.innerHTML += `\n<span class="terminal-prompt">admin@antigravity:~$</span> ${escapeHTML(cmd)}`;
+                    
+                    // Process command
+                    const cmdLower = cmd.toLowerCase();
+                    let output = "";
+                    
+                    if (cmdLower === "help") {
+                        output = "Available server commands:\n  help        - Show this help message\n  status      - Display server resource status and health metrics\n  logs        - Output recent HTTP access and server system logs\n  restart     - Perform soft reboot of the webserver daemon\n  deploy      - Trigger git fetch, merge, and Vercel assets rebuild\n  clear-cache - Flush system caches and database query buffers";
+                    } else if (cmdLower === "status") {
+                        output = `Server Status: ONLINE\nSystem Uptime: 4 hours, 23 minutes\nPort Binding: 0.0.0.0:8000\nCPU Utilization: 4.2% | Memory Allocation: 124MB / 512MB\nActive Websocket Threads: 3\nHost OS: Linux kernel 5.15.0-88-generic (Ubuntu)`;
+                    } else if (cmdLower === "restart") {
+                        output = "Stopping Antigravity WebServer daemon (PID 1093)... [OK]\nFlushing socket buffers... [OK]\nStarting service listener on port 8000... [OK]\nWarm reboot completed in 450ms. Server status: ONLINE";
+                    } else if (cmdLower === "deploy") {
+                        output = "Fetching remote main branch from github.com/Hmalk1234/floating-ai-coder...\nFrom github.com/Hmalk1234/floating-ai-coder\n   2d43ed9..745b9d9  main       -> origin/main\nUpdating working directory... [OK]\nBuilding production assets... [OK]\nDeployment of commit 745b9d9 successful! Vercel edge routes updated.";
+                    } else if (cmdLower === "logs") {
+                        const time = new Date().toISOString();
+                        output = `[${time}] GET /app.js?v=1.0.2 - 200 OK - 183KB\n[${time}] GET /style.css?v=1.0.2 - 200 OK - 55KB\n[${time}] POST /api/chat - 200 OK - 1.2s - Gemini 2.5 Pro\n[${time}] GET / - 200 OK - 31KB`;
+                    } else if (cmdLower === "clear-cache") {
+                        output = "Flushing template cache... [OK]\nClearing database query buffers... [OK]\nSystem cache cleared successfully. 124MB memory freed.";
+                    } else {
+                        output = `bash: ${escapeHTML(cmd)}: command not found. Type 'help' for available server commands.`;
+                    }
+                    
+                    termLogs.innerHTML += `\n${output}`;
+                    termInput.value = "";
+                    
+                    // Scroll to bottom
+                    termLogs.scrollTop = termLogs.scrollHeight;
+                }
+            });
+        }
+
+        // 7. Settings Logout Button
+        const btnSettingsLogout = document.getElementById("btn-settings-logout");
+        if (btnSettingsLogout) {
+            btnSettingsLogout.addEventListener("click", () => {
+                currentUser = null;
+                localStorage.removeItem("app_current_user");
+                checkSession();
+                showToast("🚪 Anda telah keluar (signed out)", "system");
+                
+                // Hide settings window
+                const settingsWin = document.getElementById("window-settings");
+                if (settingsWin) {
+                    settingsWin.classList.add("hidden");
+                    const settingsDock = document.getElementById("dock-settings");
+                    if (settingsDock) {
+                        settingsDock.classList.remove("active");
+                        settingsDock.classList.remove("focused");
+                    }
+                }
+            });
+        }
+
+        // Load stored theme on start
+        const savedTheme = localStorage.getItem("app_theme") || "violet";
+        applyDesktopTheme(savedTheme);
+    }
+
+    function switchSettingsTab(tabName) {
+        // Remove active class from all nav buttons
+        document.querySelectorAll(".settings-nav-btn").forEach(b => {
+            b.classList.remove("active");
+            if (b.getAttribute("data-settings-tab") === tabName) {
+                b.classList.add("active");
+            }
+        });
+        
+        // Hide all tab content views
+        document.querySelectorAll(".settings-tab-view").forEach(v => {
+            v.classList.add("hidden");
+        });
+        
+        // Show target tab content
+        const targetView = document.getElementById(`settings-tab-${tabName}`);
+        if (targetView) {
+            targetView.classList.remove("hidden");
+        }
+    }
+
+    function applyDesktopTheme(theme) {
+        // Update active card class
+        document.querySelectorAll(".theme-select-card").forEach(c => {
+            c.classList.remove("active");
+            if (c.getAttribute("data-theme") === theme) {
+                c.classList.add("active");
+            }
+        });
+        
+        // Apply theme class to desktop container
+        const desktop = document.getElementById("linux-desktop");
+        if (desktop) {
+            desktop.classList.remove("active-theme-violet", "active-theme-cyan", "active-theme-emerald", "active-theme-arch");
+            desktop.classList.add(`active-theme-${theme}`);
+        }
+        
+        // Also apply to floating panels for compatibility
+        const container = document.getElementById("floating-ai-container");
+        if (container) {
+            container.classList.remove("active-theme-violet", "active-theme-cyan", "active-theme-emerald", "active-theme-arch");
+            container.classList.add(`active-theme-${theme}`);
+        }
+        
+        const bubble = document.getElementById("floating-trigger");
+        if (bubble) {
+            bubble.classList.remove("active-theme-violet", "active-theme-cyan", "active-theme-emerald", "active-theme-arch");
+            bubble.classList.add(`active-theme-${theme}`);
+        }
+        
+        // Save selected theme
+        localStorage.setItem("app_theme", theme);
+    }
+
+    // Admin Account Actions
+    window.updateUserRole = function(username, newRole) {
+        const userIdx = users.findIndex(u => u.username === username);
+        if (userIdx !== -1) {
+            users[userIdx].role = newRole;
+            localStorage.setItem("app_users", JSON.stringify(users));
+            
+            // If the modified user is the active logged-in user, update session
+            if (currentUser && currentUser.username === username) {
+                currentUser.role = newRole;
+                localStorage.setItem("app_current_user", JSON.stringify(currentUser));
+            }
+            
+            checkSession();
+            showToast(`👤 Role ${username} berhasil diubah ke ${newRole.toUpperCase()}!`, "success");
+        }
+    };
+    
+    window.deleteUserAccount = function(username) {
+        if (currentUser && currentUser.username === username) {
+            showToast("❌ Anda tidak dapat menghapus akun Anda sendiri!", "info");
+            return;
+        }
+        
+        const userIdx = users.findIndex(u => u.username === username);
+        if (userIdx !== -1) {
+            users.splice(userIdx, 1);
+            localStorage.setItem("app_users", JSON.stringify(users));
+            renderAdminUsersTable();
+            showToast(`❌ Akun ${username} berhasil dihapus!`, "success");
+        }
+    };
+
+    window.renderAdminUsersTable = function() {
+        const listBody = document.getElementById("settings-admin-users-list");
+        if (!listBody) return;
+        listBody.innerHTML = "";
+        
+        users.forEach(user => {
+            const row = document.createElement("tr");
+            
+            // Dropdown to change role
+            let optionsHtml = "";
+            ["biasa", "creator", "admin"].forEach(r => {
+                const selected = user.role === r ? "selected" : "";
+                optionsHtml += `<option value="${r}" ${selected}>${r.toUpperCase()}</option>`;
+            });
+            
+            row.innerHTML = `
+                <td><strong>${escapeHTML(user.username)}</strong></td>
+                <td><span class="user-role-badge ${user.role}">${user.role === "biasa" ? "Biasa" : user.role}</span></td>
+                <td>
+                    <select class="settings-select" style="padding: 4px 8px; font-size: 0.72rem; width: 90px;" onchange="updateUserRole('${user.username}', this.value)">
+                        ${optionsHtml}
+                    </select>
+                </td>
+                <td>
+                    <button class="btn-settings-action" style="padding: 4px 8px; font-size: 0.72rem; background: rgba(244,63,94,0.1);" onclick="deleteUserAccount('${user.username}')">Delete</button>
+                </td>
+            `;
+            
+            listBody.appendChild(row);
+        });
+    };
+
     // Startup Session & Database Initialization
     initWorkspaceEditor();
     initVoiceCoding();
     initBugHunter();
     initUserDatabase();
     initGeminiStudio();
+    initControlCenter();
     checkSession();
     
     // Initial Focus
