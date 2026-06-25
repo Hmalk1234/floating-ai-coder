@@ -777,6 +777,25 @@ app.listen(3000, () => console.log('Server running!'));`
         });
     }
 
+    // Akses Cepat Akun Demo Autofill & Auto-Login
+    document.querySelectorAll(".btn-demo-autofill").forEach(btn => {
+        btn.addEventListener("click", () => {
+            const u = btn.getAttribute("data-username");
+            const p = btn.getAttribute("data-password");
+            
+            const activeForm = loginScreen.classList.contains("hidden") ? registerForm : loginForm;
+            if (activeForm === loginForm) {
+                document.getElementById("login-username").value = u;
+                document.getElementById("login-password").value = p;
+                loginForm.dispatchEvent(new Event("submit"));
+            } else {
+                document.getElementById("register-username").value = u;
+                document.getElementById("register-password").value = p;
+                registerForm.dispatchEvent(new Event("submit"));
+            }
+        });
+    });
+
     if (btnLogout) {
         btnLogout.addEventListener("click", () => {
             showToast("⚙️ Sistem dalam Mode Testing (Bypass Aktif). Tidak perlu keluar.", "info");
@@ -1332,7 +1351,7 @@ app.listen(3000, () => console.log('Server running!'));`
     }
 
     function scrollToBottom() {
-        chatBody.scrollTop = chatBody.scrollHeight;
+        chatMessages.scrollTop = chatMessages.scrollHeight;
     }
 
     function escapeHTML(str) {
@@ -2289,9 +2308,218 @@ if __name__ == "__main__":
         const lower = query.toLowerCase();
         const contextFile = chatFileContext.value;
 
-        // ==========================================
-        // GEMINI AI STUDIO: APP & GAME GENERATOR INTERCEPTOR
-        // ==========================================
+        // ==========================================================================
+        // CATEGORY-SPECIFIC AI COMPILATION ENGINES (INTERCEPTORS)
+        // ==========================================================================
+        
+        // ─── A. WEB & APP COMPILER (v0 by Vercel + Bolt.new) ───
+        if (currentCategory === "web" || currentCategory === "app") {
+            const isWebBuild = lower.includes("buat") || lower.includes("bikin") || lower.includes("create") || 
+                               lower.includes("web") || lower.includes("app") || lower.includes("halaman") || 
+                               lower.includes("tampilan") || lower.includes("desain") || lower.includes("design") ||
+                               lower.includes("portfolio") || lower.includes("ecommerce") || lower.includes("todo") || 
+                               lower.includes("kalkulator") || lower.includes("cuaca") || lower.includes("musik") ||
+                               lower.includes("chat") || lower.includes("toko") || lower.includes("landing");
+                               
+            if (isWebBuild) {
+                let title = "";
+                let description = "";
+                let htmlContent = "";
+                let cssContent = "";
+
+                const isMultimodal = attachedMedia.length > 0;
+                const mediaType = isMultimodal ? (attachedMedia[0].type.startsWith("image/") ? "Foto" : "Video") : "";
+                const multimodalText = isMultimodal ? `<div class="multimodal-badge" style="background: rgba(139, 92, 246, 0.15); border: 1px solid var(--theme-primary); color: #c084fc; padding: 6px 12px; border-radius: 8px; font-size: 0.75rem; display: inline-flex; align-items: center; gap: 6px; margin-bottom: 10px;"><span class="animate-pulse">📸</span> <strong>Multimodal:</strong> Menganalisis ${mediaType} "${attachedMedia[0].name}"</div><br>` : "";
+                const mediaComment = isMultimodal ? `\n    <!-- Desain terinspirasi dari media unggahan: ${attachedMedia[0].name} -->` : "";
+
+                if (lower.includes("portfolio") || lower.includes("portofolio") || lower.includes("cv") || lower.includes("biodata") || lower.includes("diri")) {
+                    title = "Developer Portfolio Hub - Cyber Edition";
+                    description = "Halaman portofolio developer premium dengan progress skill, grid proyek interaktif, formulir kontak, dan navbar glassmorphism.";
+                    htmlContent = getWebPortfolioTemplate(mediaComment);
+                    cssContent = getWebPortfolioCSS();
+                } else if (lower.includes("ecommerce") || lower.includes("e-commerce") || lower.includes("toko") || lower.includes("shop") || lower.includes("beli") || lower.includes("barang")) {
+                    title = "CyberStore - Premium E-Commerce Frontend";
+                    description = "Halaman toko online dengan pencarian barang dinamis, filter kategori, keranjang belanja (cart) interaktif, dan checkout modal.";
+                    htmlContent = getEcommerceTemplate(mediaComment);
+                    cssContent = getEcommerceCSS();
+                } else if (lower.includes("todo") || lower.includes("tugas") || lower.includes("catatan") || lower.includes("task") || lower.includes("note")) {
+                    title = "TaskFlow Pro - Advanced Productivity Dashboard";
+                    description = "Dasbor pengelola tugas dengan filter prioritas (High/Medium/Low), progress completion bar dinamis, dan local storage.";
+                    htmlContent = getTodoTemplate(mediaComment);
+                    cssContent = getTodoCSS();
+                } else if (lower.includes("music") || lower.includes("musik") || lower.includes("lagu") || lower.includes("player")) {
+                    title = "CyberBeat Player - Interactive Sound Dashboard";
+                    description = "Dasbor pemutar musik cyberpunk interaktif dengan daftar putar lagu, piringan vinyl berputar, dan efek visualizer frekuensi simulasi.";
+                    htmlContent = getMusicPlayerTemplate(mediaComment);
+                    cssContent = getMusicPlayerCSS();
+                } else if (lower.includes("chat") || lower.includes("pesan") || lower.includes("sosial") || lower.includes("messenger")) {
+                    title = "NexusChat - Sleek Messaging Client";
+                    description = "Aplikasi pesan instan dengan bilah sisi kontak aktif, profil status, gelembung pesan chat responsif, dan auto-reply AI.";
+                    htmlContent = getChatDashboardTemplate(mediaComment);
+                    cssContent = getChatDashboardCSS();
+                } else {
+                    // Default Web: HexaCore Business Dashboard
+                    title = "HexaCore Analytics - Corporate Landing Page";
+                    description = "Dasbor korporasi / analitik data interaktif dengan grafik kinerja, tabel metrik, header glassmorphic, dan visualizer modern.";
+                    htmlContent = getGenericWebTemplate(query, mediaComment);
+                    cssContent = getGenericWebCSS();
+                }
+
+                filesData["index.html"].content = htmlContent;
+                filesData["style.css"].content = cssContent;
+                loadWorkspaceFile("index.html");
+
+                appendAIResponse(
+                    `⚡ v0 + Bolt.new Engine - Web App Berhasil Dibuat`,
+                    `${multimodalText}Saya telah menyusun antarmuka web interaktif menggunakan **v0 + Bolt.new Compiler** untuk membuat: **${title}**.<br><br>
+                    ${description}<br><br>
+                    ✨ **Kode lengkap telah disuntikkan ke berkas workspace:**<br>
+                    - [index.html](file:///C:/Users/acer/.gemini/antigravity-ide/scratch/floating-ai-coder/index.html) (Struktur HTML & JS Logic)<br>
+                    - [style.css](file:///C:/Users/acer/.gemini/antigravity-ide/scratch/floating-ai-coder/style.css) (CSS Layout & Tema Neon)<br><br>
+                    💻 **Live Preview** telah di-compile secara otomatis dan berjalan di panel browser sebelah kanan! Silakan berinteraksi langsung.`,
+                    `<!-- file: index.html (v0 + Bolt.new Engine) -->\n` + htmlContent.slice(0, 320) + `\n\n... [Sisa kode ${htmlContent.split("\n").length} baris telah disuntikkan ke index.html] ...`,
+                    "html"
+                );
+
+                attachedMedia = [];
+                renderMediaPreviews();
+                return;
+            }
+        }
+
+        // ─── B. GAME COMPILER (Rosebud AI + Summer Engine) ───
+        if (currentCategory === "game") {
+            const isGameBuild = lower.includes("buat") || lower.includes("bikin") || lower.includes("game") || 
+                               lower.includes("play") || lower.includes("main") || lower.includes("canvas") ||
+                               lower.includes("clicker") || lower.includes("score") || lower.includes("ular") ||
+                               lower.includes("burung") || lower.includes("flappy") || lower.includes("snake");
+                               
+            if (isGameBuild) {
+                let title = "";
+                let description = "";
+                let htmlContent = "";
+                let cssContent = "";
+
+                const isMultimodal = attachedMedia.length > 0;
+                const mediaType = isMultimodal ? (attachedMedia[0].type.startsWith("image/") ? "Foto" : "Video") : "";
+                const multimodalText = isMultimodal ? `<div class="multimodal-badge" style="background: rgba(139, 92, 246, 0.15); border: 1px solid var(--theme-primary); color: #c084fc; padding: 6px 12px; border-radius: 8px; font-size: 0.75rem; display: inline-flex; align-items: center; gap: 6px; margin-bottom: 10px;"><span class="animate-pulse">📸</span> <strong>Multimodal:</strong> Menganalisis ${mediaType} "${attachedMedia[0].name}"</div><br>` : "";
+                const mediaComment = isMultimodal ? `\n    <!-- Visual game disinkronkan dari media: ${attachedMedia[0].name} -->` : "";
+
+                if (lower.includes("flappy") || lower.includes("burung")) {
+                    // Falls through to original flappy bird logic but with custom branded announcement
+                    // Wait, let's just let it run the original flappy bird builder but with our custom UI!
+                    // To do that, we can let it set variables and compile. Since the original has it, we can just define it!
+                } else if (lower.includes("snake") || lower.includes("ular")) {
+                    // Let it run original snake
+                } else if (lower.includes("brick") || lower.includes("breaker") || lower.includes("pong") || lower.includes("pantul")) {
+                    // Let it run original brick breaker
+                } else if (lower.includes("clicker") || lower.includes("tap") || lower.includes("hero") || lower.includes("klik")) {
+                    title = "CyberMiner - RPG Idle Clicker Game";
+                    description = "Game Idle Clicker bertema cyberpunk RPG dengan peningkatan level hero, auto-miners, partikel koin neon saat klik, dan Web Audio Synth.";
+                    htmlContent = getClickerGameTemplate(mediaComment);
+                    cssContent = getClickerGameCSS();
+                } else if (lower.includes("memory") || lower.includes("kartu") || lower.includes("cocok")) {
+                    title = "GlitchMatch - Neon Memory Card Game";
+                    description = "Game mencocokkan kartu memori bertema glitch neon dengan tracking skor, match animations, sisa waktu (timer), dan suara retro.";
+                    htmlContent = getMemoryGameTemplate(mediaComment);
+                    cssContent = getMemoryGameCSS();
+                } else {
+                    // Default Game: Cosmic Deflector Gravitational Physics Game
+                    title = "Cosmic Deflector - Gravitational Physics Game";
+                    description = "Game fisika gravitasi interaktif di mana Anda menaruh lubang hitam penarik untuk membelokkan laju partikel kosmik ke portal target.";
+                    htmlContent = getPhysicsGameTemplate(mediaComment);
+                    cssContent = getPhysicsGameCSS();
+                }
+
+                if (htmlContent) {
+                    filesData["index.html"].content = htmlContent;
+                    filesData["style.css"].content = cssContent;
+                    loadWorkspaceFile("index.html");
+
+                    appendAIResponse(
+                        `🎮 Rosebud AI + Summer Engine - Game Compiled Successfully`,
+                        `${multimodalText}Saya telah menyusun dan mengompilasi game loop interaktif menggunakan **Rosebud AI + Summer Engine** untuk membuat: **${title}**.<br><br>
+                        ${description}<br><br>
+                        ✨ **Kode lengkap telah disuntikkan ke berkas workspace:**<br>
+                        - [index.html](file:///C:/Users/acer/.gemini/antigravity-ide/scratch/floating-ai-coder/index.html) (HTML Canvas & Game Loop JS)<br>
+                        - [style.css](file:///C:/Users/acer/.gemini/antigravity-ide/scratch/floating-ai-coder/style.css) (CSS Layout)<br><br>
+                        🎮 **Live Game Preview** telah aktif secara instan! Anda dapat langsung memainkannya di panel kanan menggunakan mouse/klik/keyboard.`,
+                        `<!-- file: index.html (Rosebud AI + Summer Engine) -->\n` + htmlContent.slice(0, 320) + `\n\n... [Sisa kode ${htmlContent.split("\n").length} baris telah disuntikkan ke index.html] ...`,
+                        "html"
+                    );
+
+                    attachedMedia = [];
+                    renderMediaPreviews();
+                    return;
+                }
+            }
+        }
+
+        // ─── C. ROBLOX COMPILER (nilo.io + Roblox Assistant + Superbullet + Teksspert) ───
+        if (currentCategory === "roblox") {
+            const isRobloxBuild = lower.includes("buat") || lower.includes("bikin") || lower.includes("script") || 
+                                  lower.includes("kode") || lower.includes("luau") || lower.includes("roblox") ||
+                                  lower.includes("leaderstats") || lower.includes("kill") || lower.includes("teleport") ||
+                                  lower.includes("regen") || lower.includes("inventory") || lower.includes("tas") ||
+                                  lower.includes("leaderboard") || lower.includes("save") || lower.includes("data");
+                                  
+            if (isRobloxBuild) {
+                let title = "";
+                let description = "";
+                let codeContent = "";
+                let setupGuide = "";
+
+                if (lower.includes("leaderstats") || lower.includes("save") || lower.includes("data") || lower.includes("leaderboard")) {
+                    title = "Secure Leaderstats & DataStore Saving System";
+                    description = "Sistem papan nilai koin dan level server yang sangat aman, modular, dan teroptimasi menggunakan **DataStoreService** serta penanganan **BindToClose** untuk mengamankan data saat server mati mendadak.";
+                    codeContent = getRobloxLeaderstatsCode();
+                    setupGuide = "1. Buat **Script** baru di dalam **ServerScriptService**.\n2. Beri nama skrip `LeaderstatsManager`.\n3. Paste kode Luau di bawah ke dalam skrip tersebut.\n4. Pastikan opsi **Enable Studio Access to API Services** sudah diaktifkan di Game Settings Roblox Studio Anda.";
+                } else if (lower.includes("kill") || lower.includes("brick") || lower.includes("damage") || lower.includes("mati")) {
+                    title = "High-Performance Kill Brick & Cooldown Damage System";
+                    description = "Sistem rintangan (Kill Brick) dengan debounce aman per-pemain, variabel damage yang dapat disesuaikan, dan efek visual material neon yang berkedip saat disentuh.";
+                    codeContent = getRobloxKillBrickCode();
+                    setupGuide = "1. Buat skrip bertipe **Script** baru di dalam objek Part yang ingin Anda jadikan rintangan.\n2. Beri nama skrip `KillBrickScript`.\n3. Salin dan tempel kode program di bawah.";
+                } else if (lower.includes("teleport") || lower.includes("pindah") || lower.includes("portal")) {
+                    title = "Anti-Spam Teleport Pad System (A → B)";
+                    description = "Sistem teleportasi instan dua arah antar pad di Workspace. Dilengkapi penanganan cooldown anti-spam per-pemain untuk mencegah pemindahan berulang yang membuat karakter glitched.";
+                    codeContent = getRobloxTeleportCode();
+                    setupGuide = "1. Buat dua Part di Workspace Anda, beri nama `TelePadA` and `TelePadB`.\n2. Masukkan **Script** baru di dalam `TelePadA`.\n3. Paste kode Luau di bawah ke dalam skrip tersebut.\n4. Untuk teleportasi dua arah, duplikat skrip ke `TelePadB` dan ubah variabel `destName` di dalam skrip menjadi `TelePadA`.";
+                } else if (lower.includes("regen") || lower.includes("spawn") || lower.includes("muncul")) {
+                    title = "Automatic Model Regenerator & Object Auto-Spawner";
+                    description = "Skrip server tangguh untuk memantau keberadaan model tertentu di Workspace (e.g. mobil atau bangunan). Jika model tersebut hancur atau terhapus, skrip akan mengkloning cadangan awal secara otomatis setelah jeda waktu tertentu.";
+                    codeContent = getRobloxRegenCode();
+                    setupGuide = "1. Kelompokkan objek Anda ke dalam sebuah **Model** di Workspace dan beri nama `MyRegenModel`.\n2. Buat **Script** baru di dalam **ServerScriptService**.\n3. Beri nama skrip `RegenManager` dan tempelkan kode di bawah.";
+                } else if (lower.includes("inventory") || lower.includes("tas") || lower.includes("item") || lower.includes("ambil")) {
+                    title = "Modular Inventory & Item Pickup System (OOP Luau)";
+                    description = "Sistem penyimpanan barang (inventory) modular menggunakan arsitektur OOP Luau. Dilengkapi dengan Class ModuleScript untuk item, penanganan pengumpulan di server, dan sinkronisasi client.";
+                    codeContent = getRobloxInventoryCode();
+                    setupGuide = "1. Buat **ModuleScript** baru di dalam **ReplicatedStorage**, beri nama `ItemClass`.\n2. Paste kode kelas item di bawah.\n3. Buat **Script** server di **ServerScriptService** untuk menangani pemungutan barang.";
+                } else {
+                    title = "Advanced Custom Luau Utility Class Template";
+                    description = "Template skrip pemrograman Luau modern dengan validasi tipe data (Typed Luau), implementasi library tugas (`task`), dan arsitektur event-driven yang optimal.";
+                    codeContent = getRobloxCustomCode(query);
+                    setupGuide = "1. Masukkan **Script** server ke dalam folder **ServerScriptService**.\n2. Paste skrip utilitas kustom Luau ini.";
+                }
+
+                appendAIResponse(
+                    `⚡ Roblox AI Engine - Sukses Mengompilasi Skrip Luau`,
+                    `Saya telah menyusun skrip Luau tingkat tinggi menggunakan kecerdasan gabungan **nilo.io, Roblox Assistant, Superbullet AI, dan Teksspert AI** untuk memenuhi permintaan Anda:<br><br>
+                    <strong>🎯 Preset: ${title}</strong><br>
+                    ${description}<br><br>
+                    🛠️ **Panduan Pemasangan di Roblox Studio:**<br>
+                    ${setupGuide.replace(/\n/g, "<br>")}<br><br>
+                    Skrip ini dirancang menggunakan standar performa **60 FPS+**, penanganan memori aman (mencegah memory leaks), serta memanfaatkan library modern Roblox (\`task\`, \`Debris\`, \`Players\`).`,
+                    codeContent,
+                    "lua"
+                );
+
+                attachedMedia = [];
+                renderMediaPreviews();
+                return;
+            }
+        }
+
+        // Multimodal Analysis Simulation (General Interceptor)
         const isAppRequest = lower.includes("game") || lower.includes("buatkan") || lower.includes("bikin") || 
                              lower.includes("app") || lower.includes("web") || lower.includes("kalkulator") || 
                              lower.includes("flappy") || lower.includes("snake") || lower.includes("dashboard") ||
@@ -3773,6 +4001,33 @@ if __name__ == "__main__":
         
         const safeText = text.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
 
+        let brandHeaderHtml = "";
+        if (currentCategory === "web" || currentCategory === "app") {
+            brandHeaderHtml = `
+                <div class="ai-brand-header">
+                    <span class="ai-brand-logo">⚡</span>
+                    <span class="ai-brand-name">v0 + Bolt.new Engine</span>
+                    <span class="ai-brand-status compile">Dev Server Online</span>
+                </div>
+            `;
+        } else if (currentCategory === "game") {
+            brandHeaderHtml = `
+                <div class="ai-brand-header">
+                    <span class="ai-brand-logo">🎮</span>
+                    <span class="ai-brand-name">Rosebud AI + Summer Engine</span>
+                    <span class="ai-brand-status">Game Loop Active</span>
+                </div>
+            `;
+        } else if (currentCategory === "roblox") {
+            brandHeaderHtml = `
+                <div class="ai-brand-header">
+                    <span class="ai-brand-logo">⚡</span>
+                    <span class="ai-brand-name">Roblox Expert AI (nilo.io)</span>
+                    <span class="ai-brand-status roblox-active">Luau Compiler Ready</span>
+                </div>
+            `;
+        }
+
         let codeHtml = "";
         if (code) {
             codeHtml = `
@@ -3798,6 +4053,7 @@ if __name__ == "__main__":
         msg.innerHTML = `
             <div class="msg-avatar">🤖</div>
             <div class="msg-bubble">
+                ${brandHeaderHtml}
                 <p><strong>${escapeHTML(title)}</strong></p>
                 <p>${safeText}</p>
                 ${codeHtml}
@@ -5201,6 +5457,1778 @@ user.displayUserInfo();`;
     window.renderAdminUsersTable = function() {
         renderAdminUsersTable();
     };
+
+    // ==========================================================================
+    // DYNAMIC BRANDED AI TEMPLATE ENGINES (WEB, APP, GAME, ROBLOX)
+    // ==========================================================================
+
+    // --- A1. Web/App: Developer Portfolio (Tailwind CSS) ---
+    function getWebPortfolioTemplate(comment) {
+        return `<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Developer Portfolio Hub</title>${comment}
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&family=JetBrains+Mono&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Plus Jakarta Sans', 'sans-serif'],
+                        mono: ['JetBrains Mono', 'monospace'],
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body { background: #070a13; color: #f8fafc; font-family: 'Plus Jakarta Sans', sans-serif; }
+        .glass-card { background: rgba(15, 23, 42, 0.65); backdrop-filter: blur(16px); border: 1px solid rgba(255, 255, 255, 0.08); }
+        .glow-text { text-shadow: 0 0 15px rgba(139, 92, 246, 0.5); }
+        .glow-btn { box-shadow: 0 0 20px rgba(139, 92, 246, 0.3); }
+        .glow-btn:hover { box-shadow: 0 0 30px rgba(236, 72, 153, 0.6); }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col justify-between overflow-x-hidden">
+    <nav class="fixed top-0 left-0 w-full z-50 glass-card px-6 py-4 flex justify-between items-center">
+        <div class="text-xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-violet-500 to-pink-500 tracking-wider">NEXUS.DEV</div>
+        <div class="hidden md:flex gap-8 text-sm font-semibold text-slate-300">
+            <a href="#home" class="hover:text-violet-400 transition">Home</a>
+            <a href="#skills" class="hover:text-violet-400 transition">Skills</a>
+            <a href="#projects" class="hover:text-violet-400 transition">Projects</a>
+        </div>
+        <button onclick="toggleTheme()" class="text-slate-300 hover:text-white p-2 rounded-lg bg-slate-800/50 transition"><i class="fa-solid fa-circle-half-stroke"></i></button>
+    </nav>
+
+    <main class="flex-grow pt-28 flex flex-col px-6 max-w-4xl mx-auto w-full">
+        <!-- Hero -->
+        <section id="home" class="py-12 md:flex items-center gap-12 text-center md:text-left">
+            <div class="flex-grow space-y-6">
+                <span class="px-3 py-1 text-xs font-extrabold bg-violet-950/40 text-violet-400 rounded-full border border-violet-800/50 uppercase tracking-widest">Available for Freelance</span>
+                <h1 class="text-4xl md:text-6xl font-extrabold tracking-tight text-white leading-none">
+                    Creative <span class="text-transparent bg-clip-text bg-gradient-to-r from-violet-400 to-pink-400 glow-text">Full-Stack</span> Developer
+                </h1>
+                <p class="text-slate-400 text-base md:text-lg leading-relaxed max-w-xl">
+                    Saya merancang dan membangun website interaktif berkinerja tinggi menggunakan React, Node.js, dan Tailwind CSS. Berfokus pada estetika premium dan pengalaman pengguna.
+                </p>
+                <div class="flex gap-4 justify-center md:justify-start">
+                    <a href="#projects" class="px-6 py-3.5 bg-gradient-to-r from-violet-600 to-pink-600 rounded-xl font-bold glow-btn hover:scale-105 active:scale-95 transition duration-200">Lihat Proyek</a>
+                    <a href="#contact" class="px-6 py-3.5 border border-slate-800 hover:bg-slate-900/50 rounded-xl font-bold transition duration-200">Kontak Saya</a>
+                </div>
+            </div>
+            <div class="w-44 h-44 rounded-3xl bg-gradient-to-br from-violet-600 to-pink-500 flex items-center justify-center text-6xl mt-8 md:mt-0 mx-auto glow-btn shadow-2xl">🚀</div>
+        </section>
+
+        <!-- Skills -->
+        <section id="skills" class="py-16 border-t border-slate-900">
+            <h2 class="text-2xl font-extrabold text-center mb-10">Keahlian & <span class="text-violet-400">Teknologi</span></h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div class="glass-card p-5 rounded-2xl">
+                    <div class="flex justify-between mb-2 font-bold"><span class="text-slate-200">Frontend (React, Vite, Tailwind)</span><span class="text-violet-400">95%</span></div>
+                    <div class="w-full bg-slate-800 h-2 rounded-full overflow-hidden">
+                        <div class="bg-gradient-to-r from-violet-500 to-pink-500 h-full w-[95%]"></div>
+                    </div>
+                </div>
+                <div class="glass-card p-5 rounded-2xl">
+                    <div class="flex justify-between mb-2 font-bold"><span class="text-slate-200">Backend (NodeJS, Express, APIs)</span><span class="text-violet-400">85%</span></div>
+                    <div class="w-full bg-slate-800 h-2 rounded-full overflow-hidden">
+                        <div class="bg-gradient-to-r from-violet-500 to-pink-500 h-full w-[85%]"></div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Projects -->
+        <section id="projects" class="py-16 border-t border-slate-900">
+            <h2 class="text-2xl font-extrabold text-center mb-10">Proyek <span class="text-violet-400">Pilihan</span></h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div class="glass-card rounded-2xl overflow-hidden hover:scale-[1.02] transition duration-300">
+                    <div class="h-40 bg-gradient-to-br from-violet-950 to-slate-950 flex items-center justify-center text-4xl">🛒</div>
+                    <div class="p-6">
+                        <h3 class="font-extrabold text-lg mb-2">E-Commerce CyberStore</h3>
+                        <p class="text-sm text-slate-400 mb-4">Frontend e-commerce canggih dengan dynamic cart drawer, filter produk instan, dan checkout simulator.</p>
+                        <span class="text-xs font-bold text-violet-400 bg-violet-900/30 px-3 py-1 rounded-full border border-violet-800/30">Vite + Tailwind</span>
+                    </div>
+                </div>
+                <div class="glass-card rounded-2xl overflow-hidden hover:scale-[1.02] transition duration-300">
+                    <div class="h-40 bg-gradient-to-br from-pink-950 to-slate-950 flex items-center justify-center text-4xl">🎵</div>
+                    <div class="p-6">
+                        <h3 class="font-extrabold text-lg mb-2">CyberBeat Music Player</h3>
+                        <p class="text-sm text-slate-400 mb-4">Dasbor pemutar musik cyberpunk interaktif dengan piringan vinyl berputar, playlist, dan visualizer.</p>
+                        <span class="text-xs font-bold text-violet-400 bg-pink-900/30 px-3 py-1 rounded-full border border-pink-800/30">HTML5 Canvas + Audio</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Contact -->
+        <section id="contact" class="py-16 border-t border-slate-900 max-w-md mx-auto w-full">
+            <div class="glass-card p-6 rounded-3xl text-center">
+                <h2 class="text-xl font-extrabold mb-2">Kirim <span class="text-violet-400">Pesan</span></h2>
+                <p class="text-xs text-slate-400 mb-6">Hubungi saya untuk berkolaborasi dalam proyek Anda!</p>
+                <form onsubmit="handleSend(event)" class="space-y-4 text-left">
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-400 mb-1">NAMA</label>
+                        <input type="text" id="p-name" class="w-full bg-slate-950/50 border border-slate-800 rounded-xl p-3 text-sm focus:border-violet-500 outline-none text-white" required>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-400 mb-1">PESAN</label>
+                        <textarea id="p-msg" rows="3" class="w-full bg-slate-950/50 border border-slate-800 rounded-xl p-3 text-sm focus:border-violet-500 outline-none text-white" required></textarea>
+                    </div>
+                    <button type="submit" class="w-full py-3 bg-gradient-to-r from-violet-600 to-pink-600 rounded-xl font-bold glow-btn hover:brightness-110 active:scale-95 transition">Kirim Pesan</button>
+                </form>
+            </div>
+        </section>
+    </main>
+
+    <footer class="py-6 text-center text-xs text-slate-600 border-t border-slate-900/50">
+        &copy; 2026 NEXUS.DEV. Compiled by v0 + Bolt.new Engine.
+    </footer>
+
+    <script>
+        let isLight = false;
+        function toggleTheme() {
+            isLight = !isLight;
+            document.body.style.background = isLight ? '#f8fafc' : '#070a13';
+            document.body.style.color = isLight ? '#0f172a' : '#f8fafc';
+            alert("Tema visual disinkronkan ke " + (isLight ? "Light Mode!" : "Dark Mode!"));
+        }
+        function handleSend(e) {
+            e.preventDefault();
+            const name = document.getElementById("p-name").value;
+            alert("Halo " + name + "! Pesan Anda berhasil terkirim ke server (Simulasi).");
+            e.target.reset();
+        }
+    </script>
+</body>
+</html>`;
+    }
+
+    function getWebPortfolioCSS() {
+        return `/* style.css */
+html { scroll-behavior: smooth; }
+.glass-card { box-shadow: 0 8px 32px rgba(0, 0, 0, 0.25); }`;
+    }
+
+    // --- A2. Web/App: E-Commerce Store (Tailwind CSS) ---
+    function getEcommerceTemplate(comment) {
+        return `<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CyberStore - Tech Accessories</title>${comment}
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body { background: #070a13; color: #f8fafc; font-family: 'Plus Jakarta Sans', sans-serif; }
+        .glass { background: rgba(15, 23, 42, 0.7); backdrop-filter: blur(16px); border: 1px solid rgba(255, 255, 255, 0.08); }
+        .neon-glow { box-shadow: 0 0 20px rgba(139, 92, 246, 0.2); }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col justify-between overflow-x-hidden">
+    <!-- Nav -->
+    <nav class="fixed top-0 left-0 w-full z-50 glass px-6 py-4 flex justify-between items-center">
+        <div class="text-xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-violet-400 to-pink-500 tracking-wider">CYBER.STORE</div>
+        <div class="relative">
+            <button onclick="toggleCart()" class="px-5 py-2.5 bg-gradient-to-r from-violet-600 to-pink-500 rounded-xl font-bold flex items-center gap-2 shadow-lg">
+                <i class="fa-solid fa-cart-shopping"></i>
+                <span id="cart-count">0</span> Items
+            </button>
+        </div>
+    </nav>
+
+    <main class="flex-grow pt-24 px-6 max-w-6xl mx-auto w-full pb-12">
+        <div class="text-center py-8">
+            <h1 class="text-3xl md:text-5xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-white via-slate-200 to-violet-400">Next-Gen Tech Shop</h1>
+            <p class="text-slate-400 text-sm md:text-base mt-2">Dapatkan aksesoris teknologi premium dengan performa dan desain futuristik.</p>
+        </div>
+
+        <!-- Search Bar -->
+        <div class="max-w-md mx-auto mb-10">
+            <div class="relative flex items-center">
+                <input type="text" id="search-input" oninput="filterProducts()" placeholder="Cari nama produk aksesoris..." class="w-full bg-slate-900/60 border border-slate-800 rounded-xl py-3 pl-10 pr-4 text-sm focus:border-violet-500 outline-none text-white">
+                <i class="fa-solid fa-magnifying-glass absolute left-4 text-slate-500 text-xs"></i>
+            </div>
+        </div>
+
+        <!-- Product Grid -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6" id="product-grid">
+            <!-- Product 1 -->
+            <div class="glass rounded-2xl overflow-hidden p-5 flex flex-col justify-between product-card" data-name="neural uplink brain link">
+                <div class="h-40 bg-gradient-to-br from-violet-950 to-slate-950 rounded-xl flex items-center justify-center text-5xl mb-4">🧠</div>
+                <div>
+                    <span class="text-xs font-bold text-violet-400 uppercase tracking-widest">Gear</span>
+                    <h3 class="font-extrabold text-lg text-white mt-1 mb-2">Neural Uplink V2</h3>
+                    <p class="text-xs text-slate-400 mb-4 leading-relaxed">Konektor otak nirkabel langsung untuk meningkatkan transmisi data kognitif virtual.</p>
+                </div>
+                <div class="flex justify-between items-center mt-4">
+                    <span class="font-bold text-violet-300">Rp 4.500.000</span>
+                    <button onclick="addToCart('Neural Uplink V2', 4500000)" class="px-4 py-2 bg-slate-800 hover:bg-violet-600 rounded-lg text-xs font-bold transition">Beli</button>
+                </div>
+            </div>
+            <!-- Product 2 -->
+            <div class="glass rounded-2xl overflow-hidden p-5 flex flex-col justify-between product-card" data-name="holocontrol glass kacamata">
+                <div class="h-40 bg-gradient-to-br from-pink-950 to-slate-950 rounded-xl flex items-center justify-center text-5xl mb-4">🕶️</div>
+                <div>
+                    <span class="text-xs font-bold text-pink-400 uppercase tracking-widest">Wearables</span>
+                    <h3 class="font-extrabold text-lg text-white mt-1 mb-2">HoloControl Glass</h3>
+                    <p class="text-xs text-slate-400 mb-4 leading-relaxed">Kacamata augmented reality hologram premium dengan visualisasi real-time interaktif.</p>
+                </div>
+                <div class="flex justify-between items-center mt-4">
+                    <span class="font-bold text-pink-300">Rp 2.800.000</span>
+                    <button onclick="addToCart('HoloControl Glass', 2800000)" class="px-4 py-2 bg-slate-800 hover:bg-pink-600 rounded-lg text-xs font-bold transition">Beli</button>
+                </div>
+            </div>
+            <!-- Product 3 -->
+            <div class="glass rounded-2xl overflow-hidden p-5 flex flex-col justify-between product-card" data-name="quantum drive ssd flash disk">
+                <div class="h-40 bg-gradient-to-br from-blue-950 to-slate-950 rounded-xl flex items-center justify-center text-5xl mb-4">💾</div>
+                <div>
+                    <span class="text-xs font-bold text-blue-400 uppercase tracking-widest">Storage</span>
+                    <h3 class="font-extrabold text-lg text-white mt-1 mb-2">Quantum SSD 2TB</h3>
+                    <p class="text-xs text-slate-400 mb-4 leading-relaxed">Penyimpanan SSD super cepat berskala kuantum untuk perpindahan data instan kilat.</p>
+                </div>
+                <div class="flex justify-between items-center mt-4">
+                    <span class="font-bold text-blue-300">Rp 1.950.000</span>
+                    <button onclick="addToCart('Quantum SSD 2TB', 1950000)" class="px-4 py-2 bg-slate-800 hover:bg-blue-600 rounded-lg text-xs font-bold transition">Beli</button>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Cart Drawer (Side Modal) -->
+    <div id="cart-drawer" class="fixed top-0 right-0 w-full max-w-sm h-full z-50 glass shadow-2xl transform translate-x-full transition-transform duration-300 flex flex-col justify-between p-6">
+        <div>
+            <div class="flex justify-between items-center border-b border-slate-800 pb-4 mb-4">
+                <h2 class="text-lg font-extrabold text-white"><i class="fa-solid fa-cart-shopping mr-2"></i> Keranjang Anda</h2>
+                <button onclick="toggleCart()" class="text-slate-400 hover:text-white text-lg font-bold">&times;</button>
+            </div>
+            <div id="cart-items" class="space-y-4 overflow-y-auto max-h-[350px]">
+                <p class="text-xs text-slate-400 text-center py-10" id="empty-cart-text">Keranjang belanja kosong.</p>
+            </div>
+        </div>
+        <div class="border-t border-slate-800 pt-4 space-y-4">
+            <div class="flex justify-between font-bold text-sm text-white">
+                <span>TOTAL BAYAR:</span>
+                <span id="cart-total" class="text-violet-400">Rp 0</span>
+            </div>
+            <button onclick="checkout()" class="w-full py-3 bg-gradient-to-r from-violet-600 to-pink-500 rounded-xl font-bold text-sm shadow-lg hover:scale-[1.02] active:scale-95 transition">Checkout Sekarang</button>
+        </div>
+    </div>
+
+    <!-- Success Modal -->
+    <div id="success-modal" class="fixed top-0 left-0 w-full h-full z-50 bg-slate-950/80 backdrop-blur-sm flex items-center justify-center hidden">
+        <div class="glass p-8 rounded-3xl max-w-sm text-center border border-violet-500/20 shadow-2xl">
+            <div class="w-16 h-16 rounded-full bg-violet-600/10 border border-violet-500 flex items-center justify-center text-3xl mx-auto mb-4 animate-bounce">🎉</div>
+            <h3 class="text-xl font-extrabold text-white mb-2">Transaksi Sukses!</h3>
+            <p class="text-xs text-slate-400 leading-relaxed mb-6">Terima kasih atas pesanan Anda! Sistem simulasi v0 + Bolt.new telah merekam pembelian ini secara instan.</p>
+            <button onclick="closeSuccess()" class="px-6 py-2.5 bg-violet-600 rounded-xl font-bold text-xs transition hover:bg-violet-700">Kembali</button>
+        </div>
+    </div>
+
+    <footer class="py-6 text-center text-xs text-slate-600 border-t border-slate-900/50">
+        &copy; 2026 CYBER.STORE. Compiled by v0 + Bolt.new Engine.
+    </footer>
+
+    <script>
+        let cart = [];
+        function toggleCart() {
+            const drawer = document.getElementById("cart-drawer");
+            drawer.classList.toggle("translate-x-full");
+        }
+        function addToCart(name, price) {
+            const existing = cart.find(i => i.name === name);
+            if (existing) {
+                existing.qty++;
+            } else {
+                cart.push({ name, price, qty: 1 });
+            }
+            updateCart();
+            alert(name + " dimasukkan ke keranjang!");
+        }
+        function updateCart() {
+            const count = document.getElementById("cart-count");
+            const total = document.getElementById("cart-total");
+            const container = document.getElementById("cart-items");
+            const emptyText = document.getElementById("empty-cart-text");
+            
+            container.innerHTML = "";
+            let totalQty = 0;
+            let totalPrice = 0;
+            
+            if (cart.length === 0) {
+                container.appendChild(emptyText);
+            } else {
+                cart.forEach(item => {
+                    totalQty += item.qty;
+                    totalPrice += (item.price * item.qty);
+                    
+                    const el = document.createElement("div");
+                    el.className = "flex justify-between items-center border-b border-slate-900 pb-2";
+                    el.innerHTML = \`
+                        <div>
+                            <h4 class="font-bold text-xs text-white">\${item.name}</h4>
+                            <span class="text-[10px] text-slate-400">Rp \${item.price.toLocaleString('id-ID')} x \${item.qty}</span>
+                        </div>
+                        <button onclick="removeItem('\${item.name}')" class="text-red-400 hover:text-red-600 text-xs font-bold">Batal</button>
+                    \`;
+                    container.appendChild(el);
+                });
+            }
+            count.textContent = totalQty;
+            total.textContent = "Rp " + totalPrice.toLocaleString('id-ID');
+        }
+        function removeItem(name) {
+            cart = cart.filter(i => i.name !== name);
+            updateCart();
+        }
+        function filterProducts() {
+            const q = document.getElementById("search-input").value.toLowerCase();
+            const cards = document.querySelectorAll(".product-card");
+            cards.forEach(c => {
+                const name = c.getAttribute("data-name");
+                if (name.includes(q)) {
+                    c.style.display = "flex";
+                } else {
+                    c.style.display = "none";
+                }
+            });
+        }
+        function checkout() {
+            if (cart.length === 0) {
+                alert("Keranjang masih kosong!");
+                return;
+            }
+            cart = [];
+            updateCart();
+            toggleCart();
+            document.getElementById("success-modal").classList.remove("hidden");
+        }
+        function closeSuccess() {
+            document.getElementById("success-modal").classList.add("hidden");
+        }
+    </script>
+</body>
+</html>`;
+    }
+
+    function getEcommerceCSS() {
+        return `/* style.css */
+.glass { box-shadow: 0 4px 20px rgba(0,0,0,0.2); }`;
+    }
+
+    // --- A3. Web/App: Todo Dashboard (Tailwind CSS) ---
+    function getTodoTemplate(comment) {
+        return `<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TaskFlow Pro - Todo Dashboard</title>${comment}
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body { background: #070a13; color: #f8fafc; font-family: 'Plus Jakarta Sans', sans-serif; }
+        .glass { background: rgba(15, 23, 42, 0.7); backdrop-filter: blur(16px); border: 1px solid rgba(255, 255, 255, 0.08); }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col justify-between overflow-x-hidden pb-12">
+    <main class="flex-grow pt-10 px-6 max-w-xl mx-auto w-full">
+        <div class="text-center mb-8">
+            <h1 class="text-3xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-violet-400 to-pink-500">TaskFlow Pro</h1>
+            <p class="text-xs text-slate-400 mt-1">Dasbor produktivitas dengan prioritas tugas, filter, dan progress bar.</p>
+        </div>
+
+        <!-- Progress Tracker Card -->
+        <div class="glass p-6 rounded-2xl mb-8 flex items-center justify-between">
+            <div class="space-y-1">
+                <h3 class="font-extrabold text-sm text-white">Status Penyelesaian</h3>
+                <p class="text-[11px] text-slate-400" id="progress-text">Menyelesaikan 0 dari 0 tugas aktif</p>
+            </div>
+            <div class="w-16 h-16 bg-slate-900 border border-slate-800 rounded-full flex items-center justify-center font-bold text-sm text-violet-400 shadow-inner" id="progress-ring">
+                0%
+            </div>
+        </div>
+
+        <!-- Add Task Form -->
+        <div class="glass p-5 rounded-2xl mb-6">
+            <form onsubmit="addTask(event)" class="space-y-4">
+                <input type="text" id="todo-input" placeholder="Tuliskan nama tugas baru..." class="w-full bg-slate-950/50 border border-slate-800 rounded-xl p-3 text-sm focus:border-violet-500 outline-none text-white" required>
+                <div class="grid grid-cols-2 gap-4">
+                    <div class="flex flex-col gap-1">
+                        <label class="text-[10px] font-bold text-slate-400">PRIORITAS</label>
+                        <select id="todo-priority" class="bg-slate-950/50 border border-slate-800 rounded-lg p-2 text-xs text-white outline-none">
+                            <option value="Tinggi">🔴 Tinggi</option>
+                            <option value="Sedang" selected>🟡 Sedang</option>
+                            <option value="Rendah">🟢 Rendah</option>
+                        </select>
+                    </div>
+                    <div class="flex flex-col gap-1">
+                        <label class="text-[10px] font-bold text-slate-400">KATEGORI</label>
+                        <select id="todo-category" class="bg-slate-950/50 border border-slate-800 rounded-lg p-2 text-xs text-white outline-none">
+                            <option value="Coding">Coding</option>
+                            <option value="Desain">Desain</option>
+                            <option value="Tugas">Tugas Rumah</option>
+                            <option value="Pribadi">Pribadi</option>
+                        </select>
+                    </div>
+                </div>
+                <button type="submit" class="w-full py-3 bg-gradient-to-r from-violet-600 to-pink-500 rounded-xl font-bold text-xs transition hover:brightness-110">Tambah Tugas</button>
+            </form>
+        </div>
+
+        <!-- Task List Header -->
+        <div class="flex justify-between items-center mb-4">
+            <h4 class="font-extrabold text-sm text-white">Daftar Tugas Anda</h4>
+            <div class="flex gap-2">
+                <button onclick="setFilter('all')" class="px-3 py-1 bg-violet-900/30 border border-violet-800/30 rounded-lg text-[10px] font-bold text-violet-400" id="btn-all">Semua</button>
+                <button onclick="setFilter('active')" class="px-3 py-1 bg-slate-800 rounded-lg text-[10px] font-bold text-slate-400" id="btn-active">Aktif</button>
+            </div>
+        </div>
+
+        <!-- Task Items -->
+        <div id="todo-items" class="space-y-3">
+            <!-- Dynamic Injection -->
+        </div>
+    </main>
+
+    <script>
+        let todos = JSON.parse(localStorage.getItem("todos_sim") || "[]");
+        let activeFilter = 'all';
+
+        function saveTodos() {
+            localStorage.setItem("todos_sim", JSON.stringify(todos));
+            renderTodos();
+        }
+
+        function addTask(e) {
+            e.preventDefault();
+            const input = document.getElementById("todo-input");
+            const priority = document.getElementById("todo-priority").value;
+            const category = document.getElementById("todo-category").value;
+            
+            todos.push({
+                id: Date.now(),
+                text: input.value.trim(),
+                priority,
+                category,
+                completed: false
+            });
+            input.value = "";
+            saveTodos();
+        }
+
+        function toggleComplete(id) {
+            todos = todos.map(t => t.id === id ? { ...t, completed: !t.completed } : t);
+            saveTodos();
+        }
+
+        function deleteTodo(id) {
+            todos = todos.filter(t => t.id !== id);
+            saveTodos();
+        }
+
+        function setFilter(f) {
+            activeFilter = f;
+            document.getElementById("btn-all").className = f === 'all' ? "px-3 py-1 bg-violet-900/30 border border-violet-800/30 rounded-lg text-[10px] font-bold text-violet-400" : "px-3 py-1 bg-slate-800 rounded-lg text-[10px] font-bold text-slate-400";
+            document.getElementById("btn-active").className = f === 'active' ? "px-3 py-1 bg-violet-900/30 border border-violet-800/30 rounded-lg text-[10px] font-bold text-violet-400" : "px-3 py-1 bg-slate-800 rounded-lg text-[10px] font-bold text-slate-400";
+            renderTodos();
+        }
+
+        function renderTodos() {
+            const container = document.getElementById("todo-items");
+            const progressRing = document.getElementById("progress-ring");
+            const progressText = document.getElementById("progress-text");
+            
+            container.innerHTML = "";
+            
+            const filtered = todos.filter(t => {
+                if (activeFilter === 'active') return !t.completed;
+                return true;
+            });
+
+            if (filtered.length === 0) {
+                container.innerHTML = \`<p class="text-xs text-slate-500 text-center py-8">Tidak ada tugas yang ditemukan.</p>\`;
+            } else {
+                filtered.forEach(t => {
+                    const el = document.createElement("div");
+                    el.className = "glass p-4 rounded-xl flex justify-between items-center border border-slate-900";
+                    const isDone = t.completed;
+                    
+                    el.innerHTML = \`
+                        <div class="flex items-center gap-3">
+                            <input type="checkbox" \${isDone ? 'checked' : ''} onchange="toggleComplete(\${t.id})" class="accent-violet-500 w-4 h-4 cursor-pointer">
+                            <div>
+                                <h5 class="text-xs font-bold \${isDone ? 'line-through text-slate-500' : 'text-white'}">\${t.text}</h5>
+                                <span class="text-[9px] text-slate-400 bg-slate-950 px-2 py-0.5 rounded border border-slate-800 mr-2">\${t.category}</span>
+                                <span class="text-[9px] font-bold \${t.priority === 'Tinggi' ? 'text-red-400' : t.priority === 'Sedang' ? 'text-yellow-400' : 'text-green-400'}">\${t.priority}</span>
+                            </div>
+                        </div>
+                        <button onclick="deleteTodo(\${t.id})" class="text-slate-500 hover:text-red-400 text-xs"><i class="fa-solid fa-trash"></i></button>
+                    \`;
+                    container.appendChild(el);
+                });
+            }
+
+            // Calculate Progress
+            const total = todos.length;
+            const completed = todos.filter(t => t.completed).length;
+            const pct = total === 0 ? 0 : Math.round((completed / total) * 100);
+            
+            progressRing.textContent = pct + "%";
+            progressText.textContent = \`Menyelesaikan \${completed} dari \${total} tugas aktif\`;
+        }
+
+        // Initial Render
+        renderTodos();
+    </script>
+</body>
+</html>`;
+    }
+
+    function getTodoCSS() {
+        return `/* style.css */
+.glass { box-shadow: 0 4px 15px rgba(0,0,0,0.15); }`;
+    }
+
+    // --- A4. Web/App: Cyberpunk Music Player (Tailwind CSS) ---
+    function getMusicPlayerTemplate(comment) {
+        return `<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CyberBeat Player</title>${comment}
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&family=JetBrains+Mono&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body { background: #06080e; color: #f8fafc; font-family: 'Plus Jakarta Sans', sans-serif; }
+        .glass { background: rgba(15, 23, 42, 0.7); backdrop-filter: blur(20px); border: 1px solid rgba(255, 255, 255, 0.08); }
+        .vinyl { transform-origin: center; transition: transform 0.2s linear; }
+        .vinyl.spinning { animation: spin 4s infinite linear; }
+        @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+        .bar { width: 3px; height: 15px; background: #8b5cf6; animation: dance 0.8s infinite ease-in-out; }
+        .bar:nth-child(2) { animation-delay: 0.2s; }
+        .bar:nth-child(3) { animation-delay: 0.4s; }
+        .bar:nth-child(4) { animation-delay: 0.1s; }
+        .bar:nth-child(5) { animation-delay: 0.3s; }
+        @keyframes dance { 0%, 100% { height: 5px; } 50% { height: 25px; } }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col justify-between overflow-x-hidden pb-12">
+    <main class="flex-grow pt-10 px-6 max-w-md mx-auto w-full">
+        <div class="text-center mb-8">
+            <h1 class="text-3xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-violet-400 to-pink-500">CyberBeat Player</h1>
+            <p class="text-xs text-slate-400 mt-1">Retro-cyberpunk music player dashboard simulation.</p>
+        </div>
+
+        <!-- Main Player UI -->
+        <div class="glass rounded-3xl p-6 text-center space-y-6">
+            <!-- Vinyl Disc Area -->
+            <div class="relative w-44 h-44 mx-auto flex items-center justify-center bg-slate-950 rounded-full border border-slate-800 shadow-2xl overflow-hidden">
+                <!-- Outer Ring -->
+                <div class="absolute inset-2 border border-slate-800/60 rounded-full"></div>
+                <div class="absolute inset-6 border border-slate-800/40 rounded-full"></div>
+                <!-- Spin vinyl -->
+                <div id="vinyl-disc" class="w-36 h-36 bg-gradient-to-br from-slate-900 via-slate-950 to-slate-900 rounded-full flex items-center justify-center vinyl">
+                    <!-- Center Sticker -->
+                    <div class="w-12 h-12 bg-gradient-to-br from-violet-600 to-pink-500 rounded-full border-2 border-slate-950 flex items-center justify-center text-slate-950 text-xs font-extrabold">🎵</div>
+                </div>
+            </div>
+
+            <!-- Title / Artist -->
+            <div>
+                <h2 class="text-lg font-extrabold text-white" id="track-title">Neon Horizon</h2>
+                <p class="text-xs text-violet-400 font-bold" id="track-artist">Lofi Operator</p>
+            </div>
+
+            <!-- Frequency Visualizer simulation -->
+            <div class="flex justify-center items-end gap-1.5 h-8" id="visualizer">
+                <div class="bar"></div>
+                <div class="bar"></div>
+                <div class="bar"></div>
+                <div class="bar"></div>
+                <div class="bar"></div>
+            </div>
+
+            <!-- Controls -->
+            <div class="flex justify-center items-center gap-6">
+                <button onclick="prevTrack()" class="text-slate-400 hover:text-white text-lg transition"><i class="fa-solid fa-backward-step"></i></button>
+                <button onclick="togglePlay()" class="w-12 h-12 rounded-full bg-gradient-to-br from-violet-600 to-pink-500 flex items-center justify-center text-white text-xl hover:scale-105 active:scale-95 shadow-lg transition" id="play-btn">
+                    <i class="fa-solid fa-play ml-1"></i>
+                </button>
+                <button onclick="nextTrack()" class="text-slate-400 hover:text-white text-lg transition"><i class="fa-solid fa-forward-step"></i></button>
+            </div>
+
+            <!-- Progress Bar -->
+            <div class="space-y-1">
+                <div class="w-full bg-slate-800 h-1 rounded-full overflow-hidden cursor-pointer">
+                    <div class="bg-gradient-to-r from-violet-500 to-pink-500 h-full w-[35%]" id="progress-bar"></div>
+                </div>
+                <div class="flex justify-between text-[10px] text-slate-400 font-mono">
+                    <span id="curr-time">0:42</span>
+                    <span>3:12</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Playlist -->
+        <div class="mt-8 space-y-3">
+            <h3 class="font-extrabold text-sm text-white">Daftar Lagu</h3>
+            <div class="glass rounded-2xl p-4 divide-y divide-slate-900">
+                <div onclick="selectTrack(0)" class="flex justify-between items-center py-2.5 cursor-pointer hover:text-violet-400" id="pl-0">
+                    <span class="text-xs font-bold">1. Neon Horizon</span>
+                    <span class="text-[10px] text-slate-500 font-mono">3:12</span>
+                </div>
+                <div onclick="selectTrack(1)" class="flex justify-between items-center py-2.5 cursor-pointer hover:text-violet-400" id="pl-1">
+                    <span class="text-xs font-bold">2. Syntax Error</span>
+                    <span class="text-[10px] text-slate-500 font-mono">2:45</span>
+                </div>
+                <div onclick="selectTrack(2)" class="flex justify-between items-center py-2.5 cursor-pointer hover:text-violet-400" id="pl-2">
+                    <span class="text-xs font-bold">3. Quantum Pulse</span>
+                    <span class="text-[10px] text-slate-500 font-mono">3:30</span>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        let isPlaying = false;
+        let activeIndex = 0;
+        const tracks = [
+            { title: "Neon Horizon", artist: "Lofi Operator", length: "3:12" },
+            { title: "Syntax Error", artist: "Cyber Glitch", length: "2:45" },
+            { title: "Quantum Pulse", artist: "Synth Weaver", length: "3:30" }
+        ];
+
+        function togglePlay() {
+            isPlaying = !isPlaying;
+            const disc = document.getElementById("vinyl-disc");
+            const playBtn = document.getElementById("play-btn");
+            const visualizer = document.getElementById("visualizer");
+            const bars = visualizer.querySelectorAll(".bar");
+            
+            if (isPlaying) {
+                disc.classList.add("spinning");
+                playBtn.innerHTML = '<i class="fa-solid fa-pause"></i>';
+                bars.forEach(b => b.style.animationPlayState = "running");
+            } else {
+                disc.classList.remove("spinning");
+                playBtn.innerHTML = '<i class="fa-solid fa-play ml-1"></i>';
+                bars.forEach(b => b.style.animationPlayState = "paused");
+            }
+        }
+
+        function selectTrack(idx) {
+            activeIndex = idx;
+            document.getElementById("track-title").textContent = tracks[idx].title;
+            document.getElementById("track-artist").textContent = tracks[idx].artist;
+            
+            for (let i = 0; i < 3; i++) {
+                document.getElementById("pl-" + i).className = i === idx ? "flex justify-between items-center py-2.5 cursor-pointer text-violet-400 font-bold" : "flex justify-between items-center py-2.5 cursor-pointer hover:text-violet-400";
+            }
+            
+            if (!isPlaying) togglePlay();
+        }
+
+        function prevTrack() {
+            let idx = activeIndex - 1;
+            if (idx < 0) idx = 2;
+            selectTrack(idx);
+        }
+
+        function nextTrack() {
+            let idx = activeIndex + 1;
+            if (idx > 2) idx = 0;
+            selectTrack(idx);
+        }
+
+        // Init
+        selectTrack(0);
+        togglePlay(); // start as paused initially
+        togglePlay(); // toggle to paused state to freeze animation
+    </script>
+</body>
+</html>`;
+    }
+
+    function getMusicPlayerCSS() {
+        return `/* style.css */
+.glass { box-shadow: 0 8px 32px rgba(0,0,0,0.25); }`;
+    }
+
+    // --- A5. Web/App: Chat Client Dashboard (Tailwind CSS) ---
+    function getChatDashboardTemplate(comment) {
+        return `<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NexusChat Hub</title>${comment}
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&family=JetBrains+Mono&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body { background: #07090e; color: #f8fafc; font-family: 'Plus Jakarta Sans', sans-serif; }
+        .glass { background: rgba(15, 23, 42, 0.7); backdrop-filter: blur(16px); border: 1px solid rgba(255, 255, 255, 0.08); }
+    </style>
+</head>
+<body class="h-screen flex flex-col overflow-hidden">
+    <main class="flex-grow flex h-full max-w-4xl mx-auto w-full overflow-hidden p-4 gap-4">
+        <!-- Sidebar Contacts -->
+        <div class="w-1/3 glass rounded-2xl flex flex-col p-4 overflow-hidden">
+            <div class="border-b border-slate-800 pb-3 mb-3 flex items-center gap-2">
+                <span class="text-lg">💬</span>
+                <h3 class="font-extrabold text-sm text-white">Kontak Aktif</h3>
+            </div>
+            <div class="flex-grow overflow-y-auto space-y-2">
+                <div class="flex items-center gap-3 p-2 rounded-xl bg-violet-950/20 border border-violet-800/30 cursor-pointer">
+                    <span class="relative">
+                        <span class="w-8 h-8 rounded-full bg-slate-800 flex items-center justify-center text-xs">🤖</span>
+                        <span class="absolute bottom-0 right-0 w-2.5 h-2.5 bg-green-500 rounded-full border-2 border-slate-950"></span>
+                    </span>
+                    <div>
+                        <h4 class="font-bold text-xs text-white">Gemini Agent</h4>
+                        <p class="text-[9px] text-slate-400">Online | AI Assistant</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Chat Area -->
+        <div class="flex-grow glass rounded-2xl flex flex-col overflow-hidden p-4 justify-between">
+            <div class="flex items-center gap-3 border-b border-slate-800 pb-3 mb-3">
+                <span class="w-8 h-8 rounded-full bg-slate-800 flex items-center justify-center text-xs">🤖</span>
+                <div>
+                    <h3 class="font-extrabold text-sm text-white">Gemini Agent</h3>
+                    <p class="text-[9px] text-green-400 font-bold">Sedang Aktif</p>
+                </div>
+            </div>
+
+            <!-- Messages Log -->
+            <div id="msg-log" class="flex-grow overflow-y-auto space-y-3 pr-2 mb-4 text-left">
+                <div class="flex gap-2">
+                    <span class="w-6 h-6 rounded-full bg-slate-800 flex items-center justify-center text-[10px]">🤖</span>
+                    <div class="bg-slate-800/60 border border-slate-700/60 p-3 rounded-2xl rounded-tl-none max-w-[80%]">
+                        <p class="text-xs text-white">Halo! Saya asisten simulasi NexusChat. Silakan ketik sesuatu di bawah, dan saya akan memberikan balasan otomatis!</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Input Form -->
+            <form onsubmit="sendMessage(event)" class="flex gap-2 bg-slate-950/80 border border-slate-800 p-2 rounded-xl">
+                <input type="text" id="m-input" placeholder="Tulis pesan Anda di sini..." class="flex-grow bg-transparent border-none text-xs text-white outline-none pl-2" required autocomplete="off">
+                <button type="submit" class="px-4 py-2 bg-gradient-to-r from-violet-600 to-pink-500 rounded-lg font-bold text-xs text-white"><i class="fa-solid fa-paper-plane"></i></button>
+            </form>
+        </div>
+    </main>
+
+    <script>
+        function sendMessage(e) {
+            e.preventDefault();
+            const input = document.getElementById("m-input");
+            const log = document.getElementById("msg-log");
+            
+            // Append User Msg
+            const uMsg = document.createElement("div");
+            uMsg.className = "flex gap-2 flex-row-reverse text-right";
+            uMsg.innerHTML = \`
+                <span class="w-6 h-6 rounded-full bg-violet-600 flex items-center justify-center text-[10px] text-white">👤</span>
+                <div class="bg-violet-600 p-3 rounded-2xl rounded-tr-none max-w-[80%] text-left">
+                    <p class="text-xs text-white">\${input.value.trim()}</p>
+                </div>
+            \`;
+            log.appendChild(uMsg);
+            
+            const q = input.value.trim();
+            input.value = "";
+            log.scrollTop = log.scrollHeight;
+            
+            // Auto Reply
+            setTimeout(() => {
+                const rMsg = document.createElement("div");
+                rMsg.className = "flex gap-2";
+                
+                let replyText = "Menarik sekali! Saya adalah simulasi AI compiler bertenaga v0 + Bolt.new.";
+                if (q.toLowerCase().includes("halo") || q.toLowerCase().includes("hi")) {
+                    replyText = "Halo juga! Senang berkenalan dengan Anda di chat room virtual ini.";
+                } else if (q.toLowerCase().includes("siapa")) {
+                    replyText = "Saya adalah NexusChat AI, asisten yang dikembangkan langsung di platform floating-ai-coder.";
+                }
+                
+                rMsg.innerHTML = \`
+                    <span class="w-6 h-6 rounded-full bg-slate-800 flex items-center justify-center text-[10px]">🤖</span>
+                    <div class="bg-slate-800/60 border border-slate-700/60 p-3 rounded-2xl rounded-tl-none max-w-[80%]">
+                        <p class="text-xs text-white">\${replyText}</p>
+                    </div>
+                \`;
+                log.appendChild(rMsg);
+                log.scrollTop = log.scrollHeight;
+            }, 1000);
+        }
+    </script>
+</body>
+</html>`;
+    }
+
+    // --- A6. Web/App: Generic business analytics dashboard/landing page ---
+    function getGenericWebTemplate(query, comment) {
+        return `<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HexaCore Business Analytics</title>${comment}
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body { background: #07090e; color: #f8fafc; font-family: 'Plus Jakarta Sans', sans-serif; }
+        .glass { background: rgba(15, 23, 42, 0.7); backdrop-filter: blur(16px); border: 1px solid rgba(255, 255, 255, 0.08); }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col justify-between overflow-x-hidden pb-12">
+    <!-- Navbar -->
+    <nav class="fixed top-0 left-0 w-full z-50 glass px-6 py-4 flex justify-between items-center">
+        <div class="text-xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-violet-400 to-pink-500 tracking-wider">HEXACORE</div>
+        <span class="text-xs font-bold text-slate-400 bg-slate-950 px-3 py-1 rounded-full border border-slate-800">Analytics Server: Online</span>
+    </nav>
+
+    <main class="flex-grow pt-24 px-6 max-w-4xl mx-auto w-full space-y-8">
+        <div class="text-center py-6">
+            <span class="text-xs font-bold text-violet-400 bg-violet-950/30 px-3 py-1 rounded-full border border-violet-800/30">PREMIUM DASHBOARD</span>
+            <h1 class="text-3xl md:text-5xl font-extrabold text-white mt-3">Sistem Analitik Bisnis</h1>
+            <p class="text-xs text-slate-400 mt-2">Permintaan: "${query.replace(/"/g, '&quot;')}" berhasil dikompilasi secara responsif.</p>
+        </div>
+
+        <!-- Metric Cards -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div class="glass p-5 rounded-2xl flex items-center gap-4">
+                <div class="w-12 h-12 bg-violet-600/10 border border-violet-500/20 rounded-xl flex items-center justify-center text-2xl">📈</div>
+                <div>
+                    <h4 class="text-xs text-slate-400">PENGUNJUNG HARI INI</h4>
+                    <p class="text-xl font-extrabold text-white">25.430 <span class="text-xs text-green-400 ml-1">+12%</span></p>
+                </div>
+            </div>
+            <div class="glass p-5 rounded-2xl flex items-center gap-4">
+                <div class="w-12 h-12 bg-pink-600/10 border border-pink-500/20 rounded-xl flex items-center justify-center text-2xl">💰</div>
+                <div>
+                    <h4 class="text-xs text-slate-400">PENDAPATAN KAS</h4>
+                    <p class="text-xl font-extrabold text-white">Rp 84,2jt <span class="text-xs text-green-400 ml-1">+8%</span></p>
+                </div>
+            </div>
+            <div class="glass p-5 rounded-2xl flex items-center gap-4">
+                <div class="w-12 h-12 bg-blue-600/10 border border-blue-500/20 rounded-xl flex items-center justify-center text-2xl">⚡</div>
+                <div>
+                    <h4 class="text-xs text-slate-400">EFISIENSI SERVER</h4>
+                    <p class="text-xl font-extrabold text-white">99,98% <span class="text-xs text-slate-400 ml-1">Stable</span></p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Interactive Stats Table -->
+        <div class="glass rounded-2xl p-6">
+            <div class="flex justify-between items-center border-b border-slate-800 pb-4 mb-4">
+                <h3 class="font-extrabold text-sm text-white">Laporan Kinerja Kampanye</h3>
+                <button onclick="refreshStats()" class="text-xs text-violet-400 hover:underline">Refresh Data</button>
+            </div>
+            <div class="overflow-x-auto text-left">
+                <table class="w-full text-xs text-slate-300">
+                    <thead>
+                        <tr class="border-b border-slate-900 text-slate-500">
+                            <th class="pb-3 font-semibold">NAMA KAMPANYE</th>
+                            <th class="pb-3 font-semibold">CLICKS</th>
+                            <th class="pb-3 font-semibold">CONVERSION</th>
+                            <th class="pb-3 font-semibold">STATUS</th>
+                        </tr>
+                    </thead>
+                    <tbody id="stats-tbody">
+                        <tr class="border-b border-slate-900">
+                            <td class="py-3 font-bold text-white">SEO Optimization</td>
+                            <td class="py-3 font-mono">14.250</td>
+                            <td class="py-3 text-green-400 font-bold">4.2%</td>
+                            <td class="py-3"><span class="bg-green-950 text-green-400 px-2 py-0.5 rounded border border-green-800 text-[10px]">Aktif</span></td>
+                        </tr>
+                        <tr class="border-b border-slate-900">
+                            <td class="py-3 font-bold text-white">Social Ads Campaign</td>
+                            <td class="py-3 font-mono">8.940</td>
+                            <td class="py-3 text-green-400 font-bold">3.8%</td>
+                            <td class="py-3"><span class="bg-green-950 text-green-400 px-2 py-0.5 rounded border border-green-800 text-[10px]">Aktif</span></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </main>
+
+    <footer class="py-6 text-center text-xs text-slate-600 border-t border-slate-900/50">
+        &copy; 2026 HEXACORE. Compiled by v0 + Bolt.new Engine.
+    </footer>
+
+    <script>
+        function refreshStats() {
+            const tbody = document.getElementById("stats-tbody");
+            const random1 = Math.floor(Math.random() * 5000) + 8000;
+            const random2 = Math.floor(Math.random() * 5000) + 5000;
+            
+            tbody.innerHTML = \`
+                <tr class="border-b border-slate-900">
+                    <td class="py-3 font-bold text-white">SEO Optimization</td>
+                    <td class="py-3 font-mono">\${random1.toLocaleString('id-ID')}</td>
+                    <td class="py-3 text-green-400 font-bold">4.6%</td>
+                    <td class="py-3"><span class="bg-green-950 text-green-400 px-2 py-0.5 rounded border border-green-800 text-[10px]">Aktif</span></td>
+                </tr>
+                <tr class="border-b border-slate-900">
+                    <td class="py-3 font-bold text-white">Social Ads Campaign</td>
+                    <td class="py-3 font-mono">\${random2.toLocaleString('id-ID')}</td>
+                    <td class="py-3 text-green-400 font-bold">3.9%</td>
+                    <td class="py-3"><span class="bg-green-950 text-green-400 px-2 py-0.5 rounded border border-green-800 text-[10px]">Aktif</span></td>
+                </tr>
+            \`;
+            alert("Data analitik diperbarui secara real-time!");
+        }
+    </script>
+</body>
+</html>`;
+    }
+
+    function getChatDashboardCSS() { return `/* style.css */`; }
+    function getGenericWebCSS() { return `/* style.css */`; }
+
+
+    // --- B1. Game: Cyberpunk Clicker Game (Rosebud AI + Summer Engine) ---
+    function getClickerGameTemplate(comment) {
+        return `<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CyberMiner RPG Clicker</title>${comment}
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Plus+Jakarta+Sans:wght@400;600;800&display=swap" rel="stylesheet">
+    <style>
+        body { background: #080b11; color: #f8fafc; font-family: 'Plus Jakarta Sans', sans-serif; }
+        .glass { background: rgba(15, 23, 42, 0.7); backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.08); }
+        .click-particle { position: absolute; pointer-events: none; animation: float-up 0.6s ease-out forwards; font-family: 'JetBrains Mono', monospace; font-weight: bold; color: #a78ef0; font-size: 1rem; text-shadow: 0 0 10px #8b5cf6; }
+        @keyframes float-up { 0% { transform: translateY(0) scale(1); opacity: 1; } 100% { transform: translateY(-50px) scale(0.8); opacity: 0; } }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col justify-between overflow-x-hidden p-6 relative">
+    <main class="flex-grow max-w-sm mx-auto w-full space-y-6 pt-4 text-center">
+        <div>
+            <h1 class="text-2xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-violet-400 to-pink-500">CYBERMINER</h1>
+            <p class="text-[10px] text-slate-400 uppercase tracking-widest">Rosebud AI + Summer Engine</p>
+        </div>
+
+        <!-- Bytecoins Display -->
+        <div class="glass p-5 rounded-2xl">
+            <h4 class="text-xs text-slate-400">TOTAL BYTECOINS</h4>
+            <div class="text-3xl font-extrabold text-white mt-1" id="coins-display">0.00 BTC</div>
+            <div class="text-[10px] text-violet-400 font-mono mt-1" id="cps-display">CPS: 0.0 | Per Click: +1.0</div>
+        </div>
+
+        <!-- Miner Main Button Area -->
+        <div class="relative py-10 flex justify-center items-center">
+            <button onclick="mineData(event)" class="w-36 h-36 rounded-full bg-gradient-to-br from-violet-600 to-pink-500 border-4 border-slate-950 flex flex-col items-center justify-center shadow-2xl hover:scale-105 active:scale-95 transition duration-150">
+                <span class="text-4xl mb-1">⚡</span>
+                <span class="font-extrabold text-xs tracking-wider">TAP DATA</span>
+            </button>
+        </div>
+
+        <!-- Shop Upgrades -->
+        <div class="space-y-3">
+            <h3 class="font-extrabold text-sm text-white text-left">Upgrade Server & Bots</h3>
+            <div class="glass rounded-2xl p-4 divide-y divide-slate-800 space-y-2 text-left">
+                <button onclick="buyUpgrade('bot')" class="w-full flex justify-between items-center py-2 text-xs hover:text-violet-400" id="upg-bot">
+                    <div>
+                        <h5 class="font-bold text-white">Auto-Clicker Bot</h5>
+                        <p class="text-[9px] text-slate-400">+0.5 CPS</p>
+                    </div>
+                    <span class="font-bold text-violet-300" id="cost-bot">Cost: 15 BTC</span>
+                </button>
+                <button onclick="buyUpgrade('cpu')" class="w-full flex justify-between items-center py-2 text-xs hover:text-violet-400" id="upg-cpu">
+                    <div>
+                        <h5 class="font-bold text-white">Overclock CPU</h5>
+                        <p class="text-[9px] text-slate-400">+1.0 per click</p>
+                    </div>
+                    <span class="font-bold text-violet-300" id="cost-cpu">Cost: 50 BTC</span>
+                </button>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        let coins = 0;
+        let cpc = 1.0;
+        let cps = 0.0;
+        let botCount = 0;
+        let cpuCount = 0;
+
+        let botCost = 15;
+        let cpuCost = 50;
+
+        // Web Audio Synth for retro sound effects
+        let audioCtx = null;
+        function synthSound(freq, duration) {
+            try {
+                if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+                if (audioCtx.state === 'suspended') audioCtx.resume();
+                
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                osc.type = 'triangle';
+                osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+                gain.gain.setValueAtTime(0.1, audioCtx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + duration);
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+                osc.start();
+                osc.stop(audioCtx.currentTime + duration);
+            } catch (e) { console.warn(e); }
+        }
+
+        function mineData(e) {
+            coins += cpc;
+            updateUI();
+            synthSound(520, 0.08);
+            
+            // Spawn Floating Particle
+            const rect = e.target.getBoundingClientRect();
+            const p = document.createElement("div");
+            p.className = "click-particle";
+            p.textContent = "+" + cpc.toFixed(1);
+            p.style.left = (e.clientX || (rect.left + rect.width/2)) + "px";
+            p.style.top = (e.clientY || (rect.top + rect.height/2)) + "px";
+            document.body.appendChild(p);
+            
+            setTimeout(() => p.remove(), 600);
+        }
+
+        function buyUpgrade(type) {
+            if (type === 'bot') {
+                if (coins >= botCost) {
+                    coins -= botCost;
+                    botCount++;
+                    cps += 0.5;
+                    botCost = Math.round(botCost * 1.5);
+                    synthSound(660, 0.15);
+                } else {
+                    alert("Bytecoins tidak cukup!");
+                }
+            } else if (type === 'cpu') {
+                if (coins >= cpuCost) {
+                    coins -= cpuCost;
+                    cpuCount++;
+                    cpc += 1.0;
+                    cpuCost = Math.round(cpuCost * 1.8);
+                    synthSound(880, 0.15);
+                } else {
+                    alert("Bytecoins tidak cukup!");
+                }
+            }
+            updateUI();
+        }
+
+        function updateUI() {
+            document.getElementById("coins-display").textContent = coins.toFixed(2) + " BTC";
+            document.getElementById("cps-display").textContent = "CPS: " + cps.toFixed(1) + " | Per Click: +" + cpc.toFixed(1);
+            document.getElementById("cost-bot").textContent = "Cost: " + botCost + " BTC";
+            document.getElementById("cost-cpu").textContent = "Cost: " + cpuCost + " BTC";
+        }
+
+        // Auto click game loop
+        setInterval(() => {
+            if (cps > 0) {
+                coins += (cps / 10);
+                updateUI();
+            }
+        }, 100);
+    </script>
+</body>
+</html>`;
+    }
+
+    function getClickerGameCSS() { return `/* style.css */`; }
+
+    // --- B2. Game: Tech memory matching game (Rosebud AI + Summer Engine) ---
+    function getMemoryGameTemplate(comment) {
+        return `<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GlitchMatch - Neon Memory Game</title>${comment}
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&display=swap" rel="stylesheet">
+    <style>
+        body { background: #07090f; color: #f8fafc; font-family: 'Plus Jakarta Sans', sans-serif; }
+        .glass { background: rgba(15, 23, 42, 0.7); backdrop-filter: blur(16px); border: 1px solid rgba(255, 255, 255, 0.08); }
+        .card-inner { perspective: 1000px; transform-style: preserve-3d; transition: transform 0.4s; }
+        .card.flipped .card-inner { transform: rotateY(180deg); }
+        .card-front, .card-back { backface-visibility: hidden; position: absolute; top: 0; left: 0; width: 100%; height: 100%; }
+        .card-back { transform: rotateY(180deg); }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col justify-between overflow-x-hidden p-6 text-center">
+    <main class="flex-grow max-w-md mx-auto w-full space-y-6 pt-4">
+        <div>
+            <h1 class="text-2xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-violet-400 to-pink-500">GLITCHMATCH</h1>
+            <p class="text-[10px] text-slate-400 tracking-widest uppercase">Rosebud AI + Summer Engine</p>
+        </div>
+
+        <div class="flex justify-between items-center glass px-4 py-3 rounded-xl text-xs">
+            <span>MOVES: <strong id="moves-display">0</strong></span>
+            <span>TIMER: <strong id="timer-display">0s</strong></span>
+        </div>
+
+        <!-- Cards Grid -->
+        <div class="grid grid-cols-4 gap-3" id="game-grid">
+            <!-- Cards generated dynamically -->
+        </div>
+
+        <button onclick="resetGame()" class="px-6 py-2 bg-slate-800 hover:bg-violet-600 rounded-xl font-bold text-xs transition">Reset Game</button>
+    </main>
+
+    <script>
+        const icons = ['💻', '🧠', '🕶️', '💾', '📶', '🔋', '🔥', '⚙️'];
+        let cards = [];
+        let flippedCards = [];
+        let moves = 0;
+        let matchedPairs = 0;
+        let timer = 0;
+        let timerInterval = null;
+        let gameStarted = false;
+
+        let audioCtx = null;
+        function beep(freq, duration) {
+            try {
+                if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+                if (audioCtx.state === 'suspended') audioCtx.resume();
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+                gain.gain.setValueAtTime(0.08, audioCtx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + duration);
+                osc.connect(gain); gain.connect(audioCtx.destination);
+                osc.start(); osc.stop(audioCtx.currentTime + duration);
+            } catch (e) { console.warn(e); }
+        }
+
+        function startTimer() {
+            timer = 0;
+            document.getElementById("timer-display").textContent = "0s";
+            clearInterval(timerInterval);
+            timerInterval = setInterval(() => {
+                timer++;
+                document.getElementById("timer-display").textContent = timer + "s";
+            }, 1000);
+        }
+
+        function resetGame() {
+            moves = 0;
+            matchedPairs = 0;
+            flippedCards = [];
+            gameStarted = false;
+            clearInterval(timerInterval);
+            document.getElementById("moves-display").textContent = "0";
+            document.getElementById("timer-display").textContent = "0s";
+            
+            // Double icons and shuffle
+            const list = [...icons, ...icons];
+            list.sort(() => Math.random() - 0.5);
+            
+            const grid = document.getElementById("game-grid");
+            grid.innerHTML = "";
+            
+            list.forEach((icon, index) => {
+                const card = document.createElement("div");
+                card.className = "w-full aspect-square relative cursor-pointer card";
+                card.innerHTML = \`
+                    <div class="card-inner w-full h-full relative">
+                        <div class="card-front w-full h-full bg-slate-900 border border-slate-800 rounded-xl flex items-center justify-center text-xl shadow-md">❓</div>
+                        <div class="card-back w-full h-full bg-violet-900 border border-violet-700 rounded-xl flex items-center justify-center text-2xl shadow-md">\${icon}</div>
+                    </div>
+                \`;
+                card.addEventListener("click", () => flipCard(card, icon, index));
+                grid.appendChild(card);
+            });
+        }
+
+        function flipCard(card, icon, index) {
+            if (!gameStarted) {
+                gameStarted = true;
+                startTimer();
+            }
+            if (card.classList.contains("flipped") || card.classList.contains("matched") || flippedCards.length >= 2) return;
+            
+            card.classList.add("flipped");
+            flippedCards.push({ card, icon, index });
+            beep(400, 0.1);
+
+            if (flippedCards.length === 2) {
+                moves++;
+                document.getElementById("moves-display").textContent = moves;
+                
+                const [c1, c2] = flippedCards;
+                if (c1.icon === c2.icon && c1.index !== c2.index) {
+                    // Match!
+                    c1.card.classList.add("matched");
+                    c2.card.classList.add("matched");
+                    flippedCards = [];
+                    matchedPairs++;
+                    setTimeout(() => beep(600, 0.2), 150);
+                    
+                    if (matchedPairs === icons.length) {
+                        clearInterval(timerInterval);
+                        setTimeout(() => {
+                            beep(800, 0.3);
+                            alert("Selamat! Anda Menang dalam " + moves + " langkah dan waktu " + timer + " detik!");
+                        }, 500);
+                    }
+                } else {
+                    // Not match
+                    setTimeout(() => {
+                        c1.card.classList.remove("flipped");
+                        c2.card.classList.remove("flipped");
+                        flippedCards = [];
+                        beep(200, 0.12);
+                    }, 1000);
+                }
+            }
+        }
+
+        // Init
+        resetGame();
+    </script>
+</body>
+</html>`;
+    }
+
+    function getMemoryGameCSS() { return `/* style.css */`; }
+
+    // --- B3. Game: Cosmic Deflector Gravitational Sandbox (Rosebud AI + Summer Engine) ---
+    function getPhysicsGameTemplate(comment) {
+        return `<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cosmic Deflector Sandbox</title>${comment}
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&family=JetBrains+Mono&display=swap" rel="stylesheet">
+    <style>
+        body { background: #07090f; color: #f8fafc; font-family: 'Plus Jakarta Sans', sans-serif; overflow: hidden; }
+        .glass { background: rgba(15, 23, 42, 0.75); backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.08); }
+        canvas { display: block; background: #04050a; border: 1px solid rgba(255, 255, 255, 0.05); border-radius: 12px; }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col items-center justify-center p-4 text-center select-none">
+    <div class="max-w-md w-full space-y-4">
+        <div>
+            <h1 class="text-xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-violet-400 to-pink-500">COSMIC DEFLECTOR</h1>
+            <p class="text-[9px] text-slate-400 uppercase tracking-widest">Physics Sandbox | Rosebud AI + Summer Engine</p>
+        </div>
+
+        <div class="flex justify-between items-center glass px-4 py-2.5 rounded-xl text-xs">
+            <span>PORTAL SCORE: <strong id="score-display" class="text-violet-400">0</strong></span>
+            <span>KLIK KANVAS: <span class="text-slate-400">Taruh Gravitasi</span></span>
+        </div>
+
+        <!-- Game Canvas -->
+        <canvas id="gameCanvas" width="380" height="340" class="shadow-2xl mx-auto"></canvas>
+
+        <button onclick="clearGravity()" class="px-6 py-2 bg-slate-800 hover:bg-violet-600 rounded-xl font-bold text-xs transition">Hapus Gravitasi</button>
+    </div>
+
+    <script>
+        const canvas = document.getElementById("gameCanvas");
+        const ctx = canvas.getContext("2d");
+        const scoreDisplay = document.getElementById("score-display");
+
+        let score = 0;
+        let particles = [];
+        let gravityPoints = [];
+        const emitter = { x: 40, y: 170 };
+        const portal = { x: 330, y: 170, radius: 16 };
+
+        let audioCtx = null;
+        function synthPop(freq, duration) {
+            try {
+                if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+                if (audioCtx.state === 'suspended') audioCtx.resume();
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+                gain.gain.setValueAtTime(0.08, audioCtx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + duration);
+                osc.connect(gain); gain.connect(audioCtx.destination);
+                osc.start(); osc.stop(audioCtx.currentTime + duration);
+            } catch (e) { console.warn(e); }
+        }
+
+        canvas.addEventListener("mousedown", (e) => {
+            const rect = canvas.getBoundingClientRect();
+            const mouseX = e.clientX - rect.left;
+            const mouseY = e.clientY - rect.top;
+            
+            // Add or remove gravity point
+            if (gravityPoints.length < 2) {
+                gravityPoints.push({ x: mouseX, y: mouseY, radius: 12, force: 0.35 });
+                synthPop(300, 0.1);
+            } else {
+                gravityPoints.shift();
+                gravityPoints.push({ x: mouseX, y: mouseY, radius: 12, force: 0.35 });
+                synthPop(300, 0.1);
+            }
+        });
+
+        function clearGravity() {
+            gravityPoints = [];
+            synthPop(200, 0.15);
+        }
+
+        // Particle class
+        class Particle {
+            constructor() {
+                this.x = emitter.x;
+                this.y = emitter.y + (Math.random() * 20 - 10);
+                this.vx = 2.2 + Math.random() * 0.5;
+                this.vy = Math.random() * 0.4 - 0.2;
+                this.radius = 2.5;
+                this.history = [];
+            }
+
+            update() {
+                // Attract to gravity points
+                gravityPoints.forEach(pt => {
+                    const dx = pt.x - this.x;
+                    const dy = pt.y - this.y;
+                    const dist = Math.sqrt(dx * dx + dy * dy);
+                    
+                    if (dist > 10) {
+                        const pull = pt.force / (dist * 0.08);
+                        this.vx += (dx / dist) * pull;
+                        this.vy += (dy / dist) * pull;
+                    }
+                });
+
+                this.x += this.vx;
+                this.y += this.vy;
+
+                // Save trail
+                this.history.push({ x: this.x, y: this.y });
+                if (this.history.length > 8) this.history.shift();
+            }
+
+            draw() {
+                // Draw trail
+                ctx.strokeStyle = "rgba(139, 92, 246, 0.15)";
+                ctx.lineWidth = 1;
+                ctx.beginPath();
+                this.history.forEach((h, i) => {
+                    if (i === 0) ctx.moveTo(h.x, h.y);
+                    else ctx.lineTo(h.x, h.y);
+                });
+                ctx.stroke();
+
+                // Draw core
+                ctx.fillStyle = "#a78ef0";
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
+                ctx.fill();
+            }
+        }
+
+        // Emitter timer
+        let spawnTimer = 0;
+
+        function loop() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            // Draw Background Grid
+            ctx.strokeStyle = "rgba(255, 255, 255, 0.02)";
+            ctx.lineWidth = 1;
+            for (let x = 0; x < canvas.width; x += 25) {
+                ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, canvas.height); ctx.stroke();
+            }
+            for (let y = 0; y < canvas.height; y += 25) {
+                ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(canvas.width, y); ctx.stroke();
+            }
+
+            // Spawn particle
+            spawnTimer++;
+            if (spawnTimer >= 15) {
+                particles.push(new Particle());
+                spawnTimer = 0;
+            }
+
+            // Update & Draw particles
+            for (let i = particles.length - 1; i >= 0; i--) {
+                const p = particles[i];
+                p.update();
+                p.draw();
+
+                // Check out of bounds
+                if (p.x < 0 || p.x > canvas.width || p.y < 0 || p.y > canvas.height) {
+                    particles.splice(i, 1);
+                    continue;
+                }
+
+                // Check Portal hit
+                const dx = portal.x - p.x;
+                const dy = portal.y - p.y;
+                const dist = Math.sqrt(dx * dx + dy * dy);
+                if (dist < portal.radius + p.radius) {
+                    particles.splice(i, 1);
+                    score++;
+                    scoreDisplay.textContent = score;
+                    synthPop(720, 0.12);
+                }
+            }
+
+            // Draw Emitter
+            ctx.fillStyle = "rgba(15, 23, 42, 0.9)";
+            ctx.strokeStyle = "rgba(139, 92, 246, 0.5)";
+            ctx.lineWidth = 2;
+            ctx.beginPath(); ctx.arc(emitter.x, emitter.y, 8, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
+            
+            // Draw Portal
+            ctx.fillStyle = "rgba(236, 72, 153, 0.05)";
+            ctx.strokeStyle = "#ec4899";
+            ctx.lineWidth = 3;
+            ctx.beginPath(); ctx.arc(portal.x, portal.y, portal.radius, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
+            
+            // Portal center glow
+            ctx.fillStyle = "#ec4899";
+            ctx.beginPath(); ctx.arc(portal.x, portal.y, 4, 0, Math.PI * 2); ctx.fill();
+
+            // Draw Gravity Points
+            gravityPoints.forEach(pt => {
+                // Outer gravity field
+                ctx.fillStyle = "rgba(139, 92, 246, 0.05)";
+                ctx.beginPath(); ctx.arc(pt.x, pt.y, 35, 0, Math.PI * 2); ctx.fill();
+                
+                // Core
+                ctx.fillStyle = "#8b5cf6";
+                ctx.beginPath(); ctx.arc(pt.x, pt.y, 6, 0, Math.PI * 2); ctx.fill();
+                
+                // Ring
+                ctx.strokeStyle = "rgba(139, 92, 246, 0.4)";
+                ctx.lineWidth = 1;
+                ctx.beginPath(); ctx.arc(pt.x, pt.y, 12, 0, Math.PI * 2); ctx.stroke();
+            });
+
+            requestAnimationFrame(loop);
+        }
+
+        // Start Loop
+        loop();
+    </script>
+</body>
+</html>`;
+    }
+
+    function getPhysicsGameCSS() { return `/* style.css */`; }
+
+
+    // --- C1. Roblox: Leaderstats & Datastore System (Luau) ---
+    function getRobloxLeaderstatsCode() {
+        return `-- [ServerScriptService] LeaderstatsManager
+-- Kompilasi Keamanan Tinggi oleh Roblox Assistant + nilo.io
+local Players = game:GetService("Players")
+local DataStoreService = game:GetService("DataStoreService")
+local PlayerDataStore = DataStoreService:GetDataStore("SecureSaveData_v3")
+
+-- Fungsi inisialisasi data untuk pemain baru
+local function onPlayerAdded(player: Player)
+    -- Membuat folder 'leaderstats' yang dikenali oleh sistem UI Roblox
+    local leaderstats = Instance.new("Folder")
+    leaderstats.Name = "leaderstats"
+    leaderstats.Parent = player
+
+    local coins = Instance.new("IntValue")
+    coins.Name = "Coins"
+    coins.Value = 0
+    coins.Parent = leaderstats
+
+    local level = Instance.new("IntValue")
+    level.Name = "Level"
+    level.Value = 1
+    level.Parent = leaderstats
+
+    -- Mengambil data tersimpan
+    local playerKey = "PlayerData_" .. player.UserId
+    local success, savedData = pcall(function()
+        return PlayerDataStore:GetAsync(playerKey)
+    end)
+
+    if success and savedData then
+        coins.Value = savedData.Coins or 0
+        level.Value = savedData.Level or 1
+        print("[🛡️ Leaderstats] Data sukses dimuat untuk " .. player.Name)
+    else
+        warn("[⚠️ Leaderstats] Gagal memuat data / data baru untuk " .. player.Name)
+    end
+end
+
+-- Fungsi penyimpanan data pemain saat keluar
+local function onPlayerRemoving(player: Player)
+    local leaderstats = player:FindFirstChild("leaderstats")
+    if not leaderstats then return end
+
+    local coins = leaderstats:FindFirstChild("Coins")
+    local level = leaderstats:FindFirstChild("Level")
+    if not (coins and level) then return end
+
+    local dataToSave = {
+        Coins = coins.Value,
+        Level = level.Value
+    }
+
+    local playerKey = "PlayerData_" .. player.UserId
+    local success, err = pcall(function()
+        PlayerDataStore:SetAsync(playerKey, dataToSave)
+    end)
+
+    if success then
+        print("[🛡️ Leaderstats] Data sukses disimpan untuk " .. player.Name)
+    else
+        warn("[🔥 Leaderstats] Gagal menyimpan data untuk " .. player.Name .. ": " .. tostring(err))
+    end
+end
+
+-- Hubungkan Event Listener
+Players.PlayerAdded:Connect(onPlayerAdded)
+Players.PlayerRemoving:Connect(onPlayerRemoving)
+
+-- BindToClose untuk mengamankan data jika server crash/shutdown
+game:BindToClose(function()
+    print("[⚠️ Server] Shutdown terdeteksi! Menyimpan seluruh data pemain aktif...")
+    for _, player in ipairs(Players:GetPlayers()) do
+        task.spawn(onPlayerRemoving, player)
+    end
+    task.wait(1.5) -- Memberikan toleransi waktu pemrosesan sinkron DataStore
+end)`;
+    }
+
+    // --- C2. Roblox: Advanced Kill Brick (Luau) ---
+    function getRobloxKillBrickCode() {
+        return `-- [Inside Part] KillBrickScript
+-- Dirancang Optimal oleh Superbullet AI + Teksspert AI
+local part = script.Parent :: Part
+local DAMAGE = 100 -- Ubah nominal damage di sini
+local COOLDOWN = 0.5 -- Cooldown sentuhan per pemain
+
+local debounceTable = {}
+
+local function onTouched(otherPart: BasePart)
+    local character = otherPart.Parent
+    if not character then return end
+
+    local humanoid = character:FindFirstChildOfClass("Humanoid")
+    local rootPart = character:FindFirstChild("HumanoidRootPart")
+    
+    if humanoid and rootPart and humanoid.Health > 0 then
+        local player = game.Players:GetPlayerFromCharacter(character)
+        if not player then return end -- Hanya memberi damage ke pemain asli
+
+        -- Cek cooldown pemain
+        if debounceTable[player] then return end
+        debounceTable[player] = true
+
+        -- Mengurangi Health pemain
+        humanoid:TakeDamage(DAMAGE)
+
+        -- Visual flash feedback
+        local originalColor = part.Color
+        part.Color = Color3.fromRGB(255, 60, 60)
+        part.Material = Enum.Material.Neon
+
+        task.delay(COOLDOWN, function()
+            debounceTable[player] = nil
+        end)
+
+        task.wait(0.2)
+        part.Color = originalColor
+        part.Material = Enum.Material.SmoothPlastic
+    end
+end
+
+part.Touched:Connect(onTouched)`;
+    }
+
+    // --- C3. Roblox: Anti-Spam Teleportation Pads (Luau) ---
+    function getRobloxTeleportCode() {
+        return `-- [Inside TelePadA] TeleportScript
+-- Dikembangkan dengan aman oleh nilo.io + Roblox Assistant
+local pad = script.Parent :: Part
+local destName = "TelePadB" -- Nama target pad tujuan di Workspace
+local COOLDOWN_TIME = 1.5
+
+local cooldownPlayers = {}
+
+local function onTouched(otherPart: BasePart)
+    local character = otherPart.Parent
+    if not character then return end
+
+    local humanoid = character:FindFirstChildOfClass("Humanoid")
+    local rootPart = character:FindFirstChild("HumanoidRootPart")
+    
+    if humanoid and rootPart and humanoid.Health > 0 then
+        local player = game.Players:GetPlayerFromCharacter(character)
+        if not player then return end
+
+        -- Cek cooldown anti-spam
+        if cooldownPlayers[player] then return end
+        
+        local destinationPad = workspace:FindFirstChild(destName) :: Part
+        if not destinationPad then 
+            warn("[🚨 Teleport] Target Pad " .. destName .. " tidak ditemukan di Workspace!")
+            return 
+        end
+
+        -- Kunci status cooldown pemain
+        cooldownPlayers[player] = true
+        
+        -- Memindahkan posisi pemain sedikit di atas pad tujuan (menghindari stuck)
+        rootPart.CFrame = destinationPad.CFrame + Vector3.new(0, 3.5, 0)
+        print("[🛡️ Teleport] Karakter " .. player.Name .. " berhasil berpindah.")
+
+        -- Menghapus cooldown setelah durasi selesai
+        task.delay(COOLDOWN_TIME, function()
+            cooldownPlayers[player] = nil
+        end)
+    end
+end
+
+pad.Touched:Connect(onTouched)`;
+    }
+
+    // --- C4. Roblox: Automatic Model Regenerator (Luau) ---
+    function getRobloxRegenCode() {
+        return `-- [ServerScriptService] RegenManager
+-- Sistem Respawn Model oleh Superbullet AI + Teksspert AI
+local modelName = "MyRegenModel"
+local targetModel = workspace:WaitForChild(modelName) :: Model
+local REGEN_DELAY = 4.0 -- Jeda waktu respawn (detik)
+
+-- Membuat kloningan cadangan model saat server mulai berjalan
+local backupModel = targetModel:Clone()
+backupModel.Parent = game:GetService("ReplicatedStorage") -- Taruh cadangan dengan aman
+
+local function startMonitoring()
+    while true do
+        task.wait(3) -- Memeriksa status setiap 3 detik sekali
+        
+        -- Mengecek apakah model asli telah dihapus / hancur
+        if not workspace:FindFirstChild(modelName) then
+            print("[🛡️ Spawner] Model " .. modelName .. " hancur! Meregenerasi dalam " .. REGEN_DELAY .. " detik...")
+            task.wait(REGEN_DELAY)
+            
+            -- Kloning model baru dari ReplicatedStorage dan letakkan di Workspace
+            local newModel = backupModel:Clone()
+            newModel.Parent = workspace
+            newModel:MakeJoints() -- Menyambungkan sambungan joint model
+            
+            print("[🛡️ Spawner] Model " .. modelName .. " berhasil diregenerasi ke Workspace.")
+        end
+    end
+end
+
+task.spawn(startMonitoring)`;
+    }
+
+    // --- C5. Roblox: Modular OOP Inventory (Luau) ---
+    function getRobloxInventoryCode() {
+        return `-- [ReplicatedStorage -> ModuleScript] ItemClass
+-- Kode modular OOP modern oleh nilo.io + Roblox Assistant
+local ItemClass = {}
+ItemClass.__index = ItemClass
+
+export type ItemType = {
+    Name: string,
+    Rarity: string,
+    Value: number
+}
+
+function ItemClass.new(name: string, rarity: string, value: number): ItemType
+    local self = setmetatable({}, ItemClass)
+    
+    self.Name = name
+    self.Rarity = rarity
+    self.Value = value
+    
+    return self
+end
+
+function ItemClass:Use(player: Player)
+    print(("[🛡️ Inventory] Pemain %s menggunakan item %s (%s)"):format(player.Name, self.Name, self.Rarity))
+    -- Masukkan efek logika item di sini
+end
+
+return ItemClass
+
+-- ==========================================================================
+-- [ServerScriptService -> Script] InventoryServer
+-- ==========================================================================
+-- local ReplicatedStorage = game:GetService("ReplicatedStorage")
+-- local ItemClass = require(ReplicatedStorage:WaitForChild("ItemClass"))
+-- local inventoryDB = {}
+--
+-- game.Players.PlayerAdded:Connect(function(player)
+--     inventoryDB[player] = {}
+-- end)
+--
+-- local function giveItem(player, itemName, rarity, value)
+--     local item = ItemClass.new(itemName, rarity, value)
+--     table.insert(inventoryDB[player], item)
+--     print(("[🛡️] Item %s ditambahkan ke inventory %s"):format(itemName, player.Name))
+-- end`;
+    }
+
+    // --- C6. Roblox: General custom script (Luau) ---
+    function getRobloxCustomCode(query) {
+        return `-- [ServerScriptService] CustomUtilityScript
+-- Compiled by Roblox Assistant + nilo.io
+-- Deskripsi: ${query.replace(/"/g, "")}
+local Players = game:GetService("Players")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+
+-- Konfigurasi tipe data Typed Luau
+type ConfigTable = {
+    DebugMode: boolean,
+    RefreshRate: number
+}
+
+local config: ConfigTable = {
+    DebugMode = true,
+    RefreshRate = 0.5
+}
+
+local function handleTaskExecution(player: Player)
+    if config.DebugMode then
+        print("[🛡️ Luau Engine] Menjalankan tugas kustom untuk pemain: " .. player.Name)
+    end
+    
+    -- Menggunakan modern task library dibanding wait()
+    task.wait(config.RefreshRate)
+    
+    -- Tulis logika tambahan Anda di sini
+end
+
+Players.PlayerAdded:Connect(function(player)
+    player.CharacterAdded:Connect(function(character)
+        task.spawn(handleTaskExecution, player)
+    end)
+end)`;
+    }
 
     // Startup Session & Database Initialization
     initWorkspaceEditor();

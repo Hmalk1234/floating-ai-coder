@@ -1979,3 +1979,591 @@ body {
     cursor: se-resize;
     z-index: 100;
 }
+
+/* ==========================================================================
+   IMMERSIVE UPGRADE & CHAT SCROLLING SYSTEM
+   ========================================================================== */
+
+/* Fix main container flow to support proper scrolling */
+.panel-main-content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    height: 100%;
+}
+
+.panel-body {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+.tab-view {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+.tab-view.hidden {
+    display: none !important;
+}
+
+/* Ensure chat messages container takes up the space and scrolls */
+.chat-messages {
+    flex: 1;
+    overflow-y: auto !important;
+    padding: 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+/* Ensure other boxes scroll within themselves if content overflows */
+.creator-studio-box,
+.admin-panel-box,
+.bughunter-box {
+    flex: 1;
+    overflow-y: auto;
+    padding: 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+/* ── IMMERSIVE AUTHENTICATION STYLE ── */
+.auth-box {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+    background: radial-gradient(circle at center, rgba(17, 24, 39, 0.45) 0%, rgba(3, 7, 18, 0.8) 100%);
+    position: relative;
+}
+
+/* Futuristic background ambient neon glow */
+.auth-box::before {
+    content: '';
+    position: absolute;
+    width: 250px;
+    height: 250px;
+    background: var(--theme-primary);
+    filter: blur(80px);
+    opacity: 0.12;
+    border-radius: 50%;
+    z-index: 0;
+    pointer-events: none;
+    animation: breathing-glow 8s infinite ease-in-out;
+}
+
+@keyframes breathing-glow {
+    0%, 100% { transform: scale(1); opacity: 0.12; }
+    50% { transform: scale(1.2); opacity: 0.22; }
+}
+
+.auth-screen {
+    position: relative;
+    z-index: 1;
+    width: 100%;
+    max-width: 360px;
+    background: rgba(15, 23, 42, 0.65) !important;
+    backdrop-filter: blur(24px) !important;
+    -webkit-backdrop-filter: blur(24px) !important;
+    border: 1px solid rgba(255, 255, 255, 0.08) !important;
+    border-radius: 20px !important;
+    padding: 30px !important;
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.3), inset 0 1px 1px rgba(255, 255, 255, 0.1) !important;
+    transform: translateY(0);
+    transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.auth-screen:hover {
+    border-color: rgba(255, 255, 255, 0.15) !important;
+    box-shadow: 0 25px 60px rgba(0, 0, 0, 0.4), 
+                0 0 30px var(--theme-glow),
+                inset 0 1px 1px rgba(255, 255, 255, 0.15) !important;
+}
+
+.auth-title {
+    font-size: 1.5rem !important;
+    font-weight: 800 !important;
+    text-align: center;
+    margin-bottom: 6px !important;
+    background: linear-gradient(135deg, #ffffff 30%, var(--theme-primary) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    letter-spacing: -0.5px;
+}
+
+.auth-subtitle {
+    font-size: 0.76rem !important;
+    color: var(--slate-10) !important;
+    text-align: center;
+    margin-bottom: 24px !important;
+}
+
+/* AI Holographic Core Visual */
+.auth-ai-core {
+    width: 50px;
+    height: 50px;
+    margin: 0 auto 20px auto;
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.auth-ai-core .core-orb {
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--theme-primary), #ec4899);
+    box-shadow: 0 0 20px var(--theme-primary);
+    z-index: 2;
+    animation: core-pulse 2s infinite ease-in-out;
+}
+
+.auth-ai-core .core-ring-1,
+.auth-ai-core .core-ring-2 {
+    position: absolute;
+    border: 1px dashed var(--theme-primary);
+    opacity: 0.4;
+    border-radius: 50%;
+    pointer-events: none;
+}
+
+.auth-ai-core .core-ring-1 {
+    width: 38px;
+    height: 38px;
+    animation: core-rotate-clockwise 8s infinite linear;
+    border-top-color: transparent;
+}
+
+.auth-ai-core .core-ring-2 {
+    width: 50px;
+    height: 50px;
+    animation: core-rotate-counter 12s infinite linear;
+    border-bottom-color: transparent;
+    border-right-color: #ec4899;
+}
+
+@keyframes core-pulse {
+    0%, 100% { transform: scale(1); box-shadow: 0 0 15px var(--theme-primary); }
+    50% { transform: scale(1.15); box-shadow: 0 0 25px #ec4899, 0 0 40px var(--theme-primary); }
+}
+
+@keyframes core-rotate-clockwise {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}
+
+@keyframes core-rotate-counter {
+    from { transform: rotate(360deg); }
+    to { transform: rotate(0deg); }
+}
+
+/* Form controls */
+.auth-form .form-group {
+    margin-bottom: 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.auth-form label {
+    font-size: 0.72rem;
+    font-weight: 600;
+    color: var(--slate-10);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    text-align: left;
+}
+
+.auth-form input[type="text"],
+.auth-form input[type="password"] {
+    width: 100%;
+    background: rgba(0, 0, 0, 0.3) !important;
+    border: 1px solid rgba(255, 255, 255, 0.08) !important;
+    border-radius: 10px !important;
+    padding: 10px 14px !important;
+    font-size: 0.82rem !important;
+    color: #ffffff !important;
+    outline: none !important;
+    transition: all 0.25s ease;
+}
+
+.auth-form input[type="text"]:focus,
+.auth-form input[type="password"]:focus {
+    border-color: var(--theme-primary) !important;
+    box-shadow: 0 0 12px var(--theme-glow), inset 0 1px 2px rgba(0,0,0,0.4) !important;
+    background: rgba(0, 0, 0, 0.45) !important;
+}
+
+.btn-auth-submit {
+    width: 100% !important;
+    background: linear-gradient(135deg, var(--theme-primary), #ec4899) !important;
+    color: #ffffff !important;
+    border: none !important;
+    border-radius: 10px !important;
+    padding: 12px !important;
+    font-size: 0.84rem !important;
+    font-weight: 700 !important;
+    cursor: pointer;
+    margin-top: 10px;
+    box-shadow: 0 8px 20px var(--theme-glow) !important;
+    transition: all 0.2s ease;
+}
+
+.btn-auth-submit:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 12px 25px var(--theme-glow) !important;
+    filter: brightness(1.1);
+}
+
+.btn-auth-submit:active {
+    transform: translateY(0);
+}
+
+.auth-switch-text {
+    text-align: center;
+    font-size: 0.74rem;
+    color: var(--slate-10);
+    margin-top: 20px;
+}
+
+.auth-switch-text a {
+    color: var(--theme-primary);
+    text-decoration: none;
+    font-weight: 600;
+    transition: color 0.2s;
+}
+
+.auth-switch-text a:hover {
+    color: #ec4899;
+    text-decoration: underline;
+}
+
+/* Demo Autofill Panel */
+.demo-autofill-panel {
+    margin-top: 24px;
+    border-top: 1px dashed rgba(255, 255, 255, 0.08);
+    padding-top: 16px;
+}
+
+.demo-title {
+    font-size: 0.68rem;
+    font-weight: 700;
+    color: var(--slate-9);
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    margin-bottom: 8px;
+    text-align: center;
+}
+
+.demo-buttons-wrapper {
+    display: flex;
+    justify-content: center;
+    gap: 6px;
+    flex-wrap: wrap;
+}
+
+.btn-demo-autofill {
+    background: rgba(255, 255, 255, 0.04) !important;
+    border: 1px solid rgba(255, 255, 255, 0.06) !important;
+    color: var(--slate-10) !important;
+    font-size: 0.66rem !important;
+    font-weight: 600 !important;
+    padding: 5px 10px !important;
+    border-radius: 99px !important;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.btn-demo-autofill:hover {
+    background: rgba(255, 255, 255, 0.08) !important;
+    border-color: var(--theme-primary) !important;
+    color: #ffffff !important;
+    transform: scale(1.04);
+}
+
+/* ── IMMERSIVE CREATOR SPACE & STUDIO REDESIGN ── */
+.creator-studio-box,
+.settings-tab-view#settings-tab-creator {
+    background: radial-gradient(circle at top right, rgba(255, 255, 255, 0.02) 0%, rgba(0, 0, 0, 0.03) 100%);
+    border-radius: 12px;
+}
+
+.studio-form,
+#settings-creator-form {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    margin-top: 16px;
+}
+
+/* Glassmorphic step grouping cards */
+.form-step-card {
+    background: rgba(255, 255, 255, 0.55) !important;
+    border: 1px solid var(--slate-4) !important;
+    border-radius: var(--radius-lg) !important;
+    padding: 18px !important;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.01) !important;
+    position: relative;
+    overflow: hidden;
+    transition: all 0.2s ease;
+}
+
+.form-step-card:hover {
+    background: rgba(255, 255, 255, 0.85) !important;
+    border-color: var(--slate-5) !important;
+    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.02) !important;
+}
+
+/* Step marker */
+.form-step-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 3px;
+    height: 100%;
+    background: var(--theme-primary);
+    opacity: 0.7;
+}
+
+.form-step-title {
+    font-size: 0.76rem;
+    font-weight: 700;
+    color: var(--theme-primary);
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    text-align: left;
+}
+
+/* Advanced inputs */
+.form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.form-group label {
+    font-size: 0.72rem;
+    font-weight: 600;
+    color: var(--slate-11);
+    text-align: left;
+}
+
+.form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+}
+
+.form-group input[type="text"],
+.form-group select {
+    background: #ffffff !important;
+    border: 1px solid var(--slate-4) !important;
+    border-radius: var(--radius-sm) !important;
+    padding: 8px 12px !important;
+    font-size: 0.78rem !important;
+    color: var(--slate-12) !important;
+    transition: all 0.2s ease;
+    outline: none;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.form-group input[type="text"]:focus,
+.form-group select:focus {
+    border-color: var(--theme-primary) !important;
+    box-shadow: 0 0 0 3px var(--theme-accent) !important;
+    outline: none !important;
+}
+
+/* IDE Code Editor style textarea */
+.code-editor-wrapper {
+    position: relative;
+    border-radius: var(--radius-md);
+    overflow: hidden;
+    border: 1px solid var(--slate-5);
+    background: #090d16;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+    text-align: left;
+}
+
+.code-editor-header {
+    background: #111827;
+    border-bottom: 1px solid #1f2937;
+    padding: 8px 14px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.editor-dots {
+    display: flex;
+    gap: 5px;
+}
+
+.editor-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+}
+.editor-dot.red { background: #ef4444; }
+.editor-dot.yellow { background: #f59e0b; }
+.editor-dot.green { background: #10b981; }
+
+.editor-title {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.65rem;
+    color: #9ca3af;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.code-editor-body {
+    display: flex;
+    position: relative;
+}
+
+/* Simulated line numbers gutter */
+.editor-gutter {
+    background: #0d1117;
+    border-right: 1px solid #21262d;
+    padding: 12px 8px;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    user-select: none;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.72rem;
+    color: #484f58;
+    line-height: 1.5;
+    min-width: 32px;
+}
+
+.code-editor-textarea {
+    flex: 1;
+    background: transparent !important;
+    border: none !important;
+    color: #e6edf3 !important;
+    font-family: 'JetBrains Mono', monospace !important;
+    font-size: 0.76rem !important;
+    line-height: 1.5 !important;
+    padding: 12px !important;
+    resize: vertical;
+    outline: none !important;
+    min-height: 160px;
+    tab-size: 4;
+}
+
+/* Visual verification shield badge */
+.license-status-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: rgba(48, 164, 108, 0.08);
+    border: 1px solid rgba(48, 164, 108, 0.2);
+    color: var(--jade-11);
+    padding: 4px 10px;
+    border-radius: 99px;
+    font-size: 0.68rem;
+    font-weight: 600;
+    align-self: flex-start;
+    margin-bottom: 8px;
+}
+
+/* Submit button styling */
+.btn-studio-submit,
+.btn-settings-submit {
+    background: var(--theme-primary) !important;
+    color: #ffffff !important;
+    border: none !important;
+    border-radius: var(--radius-md) !important;
+    padding: 10px 16px !important;
+    font-size: 0.8rem !important;
+    font-weight: 600 !important;
+    cursor: pointer;
+    box-shadow: 0 4px 12px var(--theme-glow) !important;
+    transition: all 0.2s ease;
+    width: 100%;
+}
+
+.btn-studio-submit:hover,
+.btn-settings-submit:hover {
+    transform: translateY(-1px);
+    filter: brightness(1.08);
+    box-shadow: 0 6px 16px var(--theme-glow) !important;
+}
+
+.btn-studio-submit:active,
+.btn-settings-submit:active {
+    transform: translateY(0);
+}
+
+/* ── CUSTOM BRANDED AI CHAT BUBBLES ── */
+.ai-brand-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+    padding-bottom: 6px;
+    margin-bottom: 8px;
+}
+
+.message.system-msg .ai-brand-header,
+.message.ai-msg .ai-brand-header {
+    border-bottom-color: var(--slate-4);
+}
+
+.ai-brand-logo {
+    font-size: 0.9rem;
+    display: inline-flex;
+    align-items: center;
+}
+
+.ai-brand-name {
+    font-family: 'Inter', system-ui, sans-serif;
+    font-weight: 800;
+    font-size: 0.72rem;
+    letter-spacing: 0.2px;
+    text-transform: uppercase;
+}
+
+.ai-brand-status {
+    font-size: 0.6rem;
+    background: var(--jade-3);
+    color: var(--jade-11);
+    padding: 1px 5px;
+    border-radius: 4px;
+    font-weight: 600;
+    margin-left: auto;
+}
+
+.ai-brand-status.compile {
+    background: var(--theme-accent);
+    color: var(--theme-primary);
+}
+
+.ai-brand-status.roblox-active {
+    background: rgba(229, 72, 77, 0.1);
+    color: #e5484d;
+}
+
+.ai-code-description {
+    font-size: 0.74rem;
+    color: var(--slate-11);
+    line-height: 1.45;
+    margin-bottom: 10px;
+}

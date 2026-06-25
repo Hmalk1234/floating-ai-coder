@@ -187,38 +187,78 @@
                         <div class="settings-tab-view hidden" id="settings-tab-creator">
                             <h3>🎨 Creator Space & Presets</h3>
                             <p class="settings-tab-subtitle">Tambahkan preset coding baru ke AI Assistant. Memerlukan License Key valid dari Admin.</p>
+                            
                             <form id="settings-creator-form" class="settings-form">
-                                <div class="form-group">
-                                    <label for="creator-key-input">License Key (Creator Key)</label>
-                                    <input type="text" id="creator-key-input" placeholder="CREATOR-XXXX-XXXX-XXXX" required>
-                                </div>
-                                <div class="form-row">
-                                    <div class="form-group">
-                                        <label for="creator-preset-category">Kategori</label>
-                                        <select id="creator-preset-category" class="settings-select" required>
-                                            <option value="roblox">Roblox</option>
-                                            <option value="web">Web</option>
-                                            <option value="game">Game (Unity/Godot)</option>
-                                            <option value="app">App (Python/JS)</option>
-                                        </select>
+                                <!-- Step 1: Verification -->
+                                <div class="form-step-card">
+                                    <div class="form-step-title">
+                                        <span>🔑</span> Langkah 1: Verifikasi Lisensi
                                     </div>
                                     <div class="form-group">
-                                        <label for="creator-preset-lang">Bahasa Pemrograman</label>
-                                        <input type="text" id="creator-preset-lang" placeholder="lua, css, javascript, python" required>
+                                        <label for="creator-key-input">License Key (Creator Key)</label>
+                                        <input type="text" id="creator-key-input" placeholder="CREATOR-XXXX-XXXX-XXXX" required>
+                                    </div>
+                                    <div class="license-status-badge">
+                                        <span>🛡️</span> Ready for Verification
                                     </div>
                                 </div>
-                                <div class="form-group">
-                                    <label for="creator-preset-title">Judul Preset (Nama Tombol)</label>
-                                    <input type="text" id="creator-preset-title" placeholder="Contoh: Script Data Saving, Flexbox Card..." required>
+
+                                <!-- Step 2: Metadata -->
+                                <div class="form-step-card">
+                                    <div class="form-step-title">
+                                        <span>📂</span> Langkah 2: Klasifikasi Preset
+                                    </div>
+                                    <div class="form-row">
+                                        <div class="form-group">
+                                            <label for="creator-preset-category">Kategori</label>
+                                            <select id="creator-preset-category" class="settings-select" required>
+                                                <option value="roblox">Roblox</option>
+                                                <option value="web">Web</option>
+                                                <option value="game">Game (Unity/Godot)</option>
+                                                <option value="app">App (Python/JS)</option>
+                                            </select>
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="creator-preset-lang">Bahasa Pemrograman</label>
+                                            <input type="text" id="creator-preset-lang" placeholder="lua, css, javascript, python" required>
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="creator-preset-title">Judul Preset (Nama Tombol)</label>
+                                        <input type="text" id="creator-preset-title" placeholder="Contoh: Script Data Saving, Flexbox Card..." required>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="creator-preset-desc">Deskripsi Singkat</label>
+                                        <input type="text" id="creator-preset-desc" placeholder="Jelaskan apa yang dilakukan oleh kode ini..." required>
+                                    </div>
                                 </div>
-                                <div class="form-group">
-                                    <label for="creator-preset-desc">Deskripsi Singkat</label>
-                                    <input type="text" id="creator-preset-desc" placeholder="Jelaskan apa yang dilakukan oleh kode ini..." required>
+
+                                <!-- Step 3: Source Code -->
+                                <div class="form-step-card">
+                                    <div class="form-step-title">
+                                        <span>💻</span> Langkah 3: Source Code Editor
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="creator-preset-code">Tulis/Tempel Kode Program</label>
+                                        <div class="code-editor-wrapper">
+                                            <div class="code-editor-header">
+                                                <div class="editor-dots">
+                                                    <span class="editor-dot red"></span>
+                                                    <span class="editor-dot yellow"></span>
+                                                    <span class="editor-dot green"></span>
+                                                </div>
+                                                <div class="editor-title">preset_code.lua</div>
+                                            </div>
+                                            <div class="code-editor-body">
+                                                <div class="editor-gutter">
+                                                    <span>1</span><span>2</span><span>3</span><span>4</span><span>5</span><span>6</span><span>7</span><span>8</span>
+                                                </div>
+                                                <textarea id="creator-preset-code" class="code-editor-textarea" placeholder="-- Tulis atau paste kode program lengkap di sini...&#10;function init()&#10;    print('Hello Creator!')&#10;end" required></textarea>
+                                            </div>
+                                        </div>
+                                    </div>
                                 </div>
-                                <div class="form-group">
-                                    <label for="creator-preset-code">Source Code</label>
-                                    <textarea id="creator-preset-code" rows="4" placeholder="Tulis atau paste kode program lengkap di sini..." required></textarea>
-                                </div>
+
                                 <button type="submit" class="btn-settings-submit">Publish Preset (Verify Key)</button>
                             </form>
                         </div>
@@ -414,6 +454,11 @@ Type 'help' for a list of available commands.
             <div id="auth-container" class="auth-box">
                 <!-- A1. LOGIN SCREEN -->
                 <div id="login-screen" class="auth-screen">
+                    <div class="auth-ai-core">
+                        <div class="core-orb"></div>
+                        <div class="core-ring-1"></div>
+                        <div class="core-ring-2"></div>
+                    </div>
                     <h3 class="auth-title">Sign In</h3>
                     <p class="auth-subtitle">Masuk ke Antigravity AI Coder</p>
                     <form id="login-form" class="auth-form">
@@ -430,10 +475,25 @@ Type 'help' for a list of available commands.
                     <div class="auth-switch-text">
                         Belum punya akun? <a href="#" id="link-to-register">Daftar sekarang</a>
                     </div>
+                    
+                    <!-- Demo Account Quick Access -->
+                    <div class="demo-autofill-panel">
+                        <div class="demo-title">Akses Cepat Akun Demo</div>
+                        <div class="demo-buttons-wrapper">
+                            <button type="button" class="btn-demo-autofill" data-username="USER" data-password="USERPOWER888">👤 User</button>
+                            <button type="button" class="btn-demo-autofill" data-username="CREATOR" data-password="CREATORPOWER888">🎨 Creator</button>
+                            <button type="button" class="btn-demo-autofill" data-username="XERO" data-password="ADMINPOWER888">🛠️ Admin</button>
+                        </div>
+                    </div>
                 </div>
                 
                 <!-- A2. REGISTRATION SCREEN -->
                 <div id="register-screen" class="auth-screen hidden">
+                    <div class="auth-ai-core">
+                        <div class="core-orb"></div>
+                        <div class="core-ring-1"></div>
+                        <div class="core-ring-2"></div>
+                    </div>
                     <h3 class="auth-title">Daftar Akun</h3>
                     <p class="auth-subtitle">Buat akun baru Anda</p>
                     <form id="register-form" class="auth-form">
@@ -449,6 +509,16 @@ Type 'help' for a list of available commands.
                     </form>
                     <div class="auth-switch-text">
                         Sudah punya akun? <a href="#" id="link-to-login">Masuk sekarang</a>
+                    </div>
+                    
+                    <!-- Demo Account Quick Access -->
+                    <div class="demo-autofill-panel">
+                        <div class="demo-title">Akses Cepat Akun Demo</div>
+                        <div class="demo-buttons-wrapper">
+                            <button type="button" class="btn-demo-autofill" data-username="USER" data-password="USERPOWER888">👤 User</button>
+                            <button type="button" class="btn-demo-autofill" data-username="CREATOR" data-password="CREATORPOWER888">🎨 Creator</button>
+                            <button type="button" class="btn-demo-autofill" data-username="XERO" data-password="ADMINPOWER888">🛠️ Admin</button>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -485,33 +555,62 @@ Type 'help' for a list of available commands.
                     <p class="view-subtitle">Tambahkan preset coding kustom ke pustaka asisten AI.</p>
                     
                     <form id="creator-preset-form" class="studio-form">
-                        <div class="form-row">
-                            <div class="form-group">
-                                <label for="preset-category">Kategori</label>
-                                <select id="preset-category" required>
-                                    <option value="roblox">Roblox</option>
-                                    <option value="web">Web</option>
-                                    <option value="game">Game (Unity/Godot)</option>
-                                    <option value="app">App (Python/JS)</option>
-                                </select>
+                        <!-- Step 1: Metadata -->
+                        <div class="form-step-card">
+                            <div class="form-step-title">
+                                <span>📂</span> Langkah 1: Detail Preset
+                            </div>
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label for="preset-category">Kategori</label>
+                                    <select id="preset-category" required>
+                                        <option value="roblox">Roblox</option>
+                                        <option value="web">Web</option>
+                                        <option value="game">Game (Unity/Godot)</option>
+                                        <option value="app">App (Python/JS)</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label for="preset-lang">Bahasa Pemrograman</label>
+                                    <input type="text" id="preset-lang" placeholder="lua, css, javascript, csharp, gdscript, python" required>
+                                </div>
                             </div>
                             <div class="form-group">
-                                <label for="preset-lang">Bahasa Pemrograman</label>
-                                <input type="text" id="preset-lang" placeholder="lua, css, javascript, csharp, gdscript, python" required>
+                                <label for="preset-title">Judul Preset (Nama Tombol)</label>
+                                <input type="text" id="preset-title" placeholder="Contoh: Script Data Saving, Flexbox Card..." required>
+                            </div>
+                            <div class="form-group">
+                                <label for="preset-desc">Deskripsi Singkat</label>
+                                <input type="text" id="preset-desc" placeholder="Jelaskan apa yang dilakukan oleh kode ini..." required>
                             </div>
                         </div>
-                        <div class="form-group">
-                            <label for="preset-title">Judul Preset (Nama Tombol)</label>
-                            <input type="text" id="preset-title" placeholder="Contoh: Script Data Saving, Flexbox Card..." required>
+
+                        <!-- Step 2: Code Editor -->
+                        <div class="form-step-card">
+                            <div class="form-step-title">
+                                <span>💻</span> Langkah 2: Source Code Editor
+                            </div>
+                            <div class="form-group">
+                                <label for="preset-code">Tulis/Tempel Kode Program</label>
+                                <div class="code-editor-wrapper">
+                                    <div class="code-editor-header">
+                                        <div class="editor-dots">
+                                            <span class="editor-dot red"></span>
+                                            <span class="editor-dot yellow"></span>
+                                            <span class="editor-dot green"></span>
+                                        </div>
+                                        <div class="editor-title">custom_preset.code</div>
+                                    </div>
+                                    <div class="code-editor-body">
+                                        <div class="editor-gutter">
+                                            <span>1</span><span>2</span><span>3</span><span>4</span><span>5</span><span>6</span><span>7</span><span>8</span>
+                                        </div>
+                                        <textarea id="preset-code" class="code-editor-textarea" placeholder="-- Tulis atau paste kode program lengkap di sini...&#10;function init()&#10;    print('Hello Studio!')&#10;end" required></textarea>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
-                        <div class="form-group">
-                            <label for="preset-desc">Deskripsi Singkat</label>
-                            <input type="text" id="preset-desc" placeholder="Jelaskan apa yang dilakukan oleh kode ini..." required>
-                        </div>
-                        <div class="form-group">
-                            <label for="preset-code">Source Code</label>
-                            <textarea id="preset-code" rows="8" placeholder="Tulis atau paste kode program lengkap di sini..." required></textarea>
-                        </div>
+
                         <button type="submit" class="btn-studio-submit">Simpan & Publikasikan Preset</button>
                     </form>
                 </div>
